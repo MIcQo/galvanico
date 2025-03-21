@@ -1,6 +1,5 @@
 # Galvanico
 
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 Galvanico is an open-source, browser-based strategy game inspired by Ikariam, but set in the Industrial Age. Players develop their own industrial cities, research new technologies, manage resources, and engage in trade and diplomacy in a world powered by electricity and innovation.
