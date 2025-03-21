@@ -1,0 +1,17 @@
+services:
+  cockroach:
+    image: cockroachdb/cockroach:latest
+    ports:
+      - "26257:26257"
+      - "25255:8080"
+    command:
+      - start-single-node
+    environment:
+      COCKROACH_USER: "game"
+      COCKROACH_PASSWORD: "game"
+
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+      - "8222:8222"
