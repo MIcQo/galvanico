@@ -4,11 +4,12 @@ services:
     ports:
       - "26257:26257"
       - "25255:8080"
-    command:
-      - start-single-node
-    environment:
-      COCKROACH_USER: "game"
-      COCKROACH_PASSWORD: "game"
+    command: start-single-node --insecure
+    volumes:
+      - "${PWD}/.docker/data/cockroach:/cockroach/cockroach-data"
+#    environment:
+#      COCKROACH_USER: "game"
+#      COCKROACH_PASSWORD: "game"
 
   nats:
     image: nats:latest

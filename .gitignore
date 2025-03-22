@@ -168,3 +168,7 @@ go.work.sum
 # env file
 .env
 
+### Custom
+
+config.yaml
+.docker
