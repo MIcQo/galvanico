@@ -1,13 +1,13 @@
-package galvanico_websocket
+package galvanico_notification
 
 import (
 	"fmt"
 	"github.com/spf13/cobra"
 )
 
-// WsCmd represents the serve command
-var WsCmd = &cobra.Command{
-	Use:   "ws",
+// sendCmd represents the serve command
+var sendCmd = &cobra.Command{
+	Use:   "send",
 	Short: "",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -16,6 +16,5 @@ var WsCmd = &cobra.Command{
 }
 
 func init() {
-	WsCmd.AddCommand(sendCmd)
-	WsCmd.AddCommand(runCmd)
+
 }

@@ -5,9 +5,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NotificationCmd represents the serve command
-var NotificationCmd = &cobra.Command{
-	Use:   "notification",
+// runCmd represents the serve command
+var runCmd = &cobra.Command{
+	Use:   "run",
 	Short: "",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -16,6 +16,5 @@ var NotificationCmd = &cobra.Command{
 }
 
 func init() {
-	NotificationCmd.AddCommand(sendCmd)
-	NotificationCmd.AddCommand(runCmd)
+	runCmd.PersistentFlags().IntP("port", "p", 8082, "port to serve on")
 }

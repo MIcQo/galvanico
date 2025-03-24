@@ -6,7 +6,6 @@ import (
 	galvanicowebsocket "galvanico/cmd/galvanico-websocket"
 	"galvanico/internal/config"
 	"galvanico/internal/database"
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -16,17 +15,15 @@ var rootCmd = &cobra.Command{
 	Use:   "galvanico",
 	Short: "Game CLI",
 	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-		log.Println("PreRun called")
 		config.FileName = cmd.Flag("config").Value.String()
 
 		if _, err := config.Load(); err != nil {
 			return err
 		}
 
-		return database.Connection().Ping(cmd.Context())
+		return database.Connection().Ping()
 	},
 	PersistentPostRunE: func(cmd *cobra.Command, _ []string) error {
-		log.Println("PostRun called")
 		return database.Close()
 	},
 }

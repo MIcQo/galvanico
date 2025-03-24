@@ -1,4 +1,5 @@
 appName: "Galvanico"
+debug: false
 
 database:
   url: "postgresql://root@127.0.0.1:26257/defaultdb?sslmode=disable"

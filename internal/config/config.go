@@ -10,6 +10,7 @@ var FileName = "config.yml"
 
 type Config struct {
 	AppName  string   `yaml:"app_name"`
+	Debug    bool     `yaml:"debug"`
 	Database Database `yaml:"database"`
 }
 

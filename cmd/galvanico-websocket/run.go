@@ -5,9 +5,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// WsCmd represents the serve command
-var WsCmd = &cobra.Command{
-	Use:   "ws",
+// runCmd represents the serve command
+var runCmd = &cobra.Command{
+	Use:   "run",
 	Short: "",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -16,6 +16,5 @@ var WsCmd = &cobra.Command{
 }
 
 func init() {
-	WsCmd.AddCommand(sendCmd)
-	WsCmd.AddCommand(runCmd)
+	runCmd.PersistentFlags().IntP("port", "p", 8082, "port to serve on")
 }
