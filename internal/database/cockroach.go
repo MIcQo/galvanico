@@ -6,12 +6,11 @@ import (
 	cfg "galvanico/internal/config"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/rs/zerolog/log"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/extra/bundebug"
 	"github.com/uptrace/bun/extra/bunotel"
-	"log"
-	"log/slog"
 	"runtime"
 	"sync"
 )
@@ -22,7 +21,7 @@ var conn *bun.DB
 // Connection create or get database connection
 func Connection() *bun.DB {
 	once.Do(func() {
-		createConnection()
+		conn = createConnection()
 	})
 
 	return conn
@@ -34,20 +33,20 @@ func Close() error {
 		return nil
 	}
 
-	slog.Debug("closing database")
+	log.Info().Msg("closing database")
 
 	return conn.Close()
 }
 
-func createConnection() {
+func createConnection() *bun.DB {
 	var config, configErr = cfg.Load()
 	if configErr != nil {
-		log.Fatal(configErr)
+		log.Fatal().Err(configErr)
 	}
 
 	connConfig, err := createPgxConfig(config)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err)
 	}
 
 	var sqldb = stdlib.OpenDB(*connConfig)
@@ -60,7 +59,9 @@ func createConnection() {
 	setupMaxConnections(sqldb)
 	registerHooks(db, config)
 
-	slog.Debug("connected to database")
+	log.Info().Msg("connected to database")
+
+	return db
 }
 
 func registerHooks(db *bun.DB, cfg *cfg.Config) {
@@ -71,14 +72,14 @@ func registerHooks(db *bun.DB, cfg *cfg.Config) {
 func addQueryLogger(config *cfg.Config) *bundebug.QueryHook {
 	return bundebug.NewQueryHook(
 		// disable the hook
-		bundebug.WithEnabled(config.Debug),
+		bundebug.WithEnabled(config.LogLevel == "debug"),
 	)
 }
 
 func addQueryTelemetry(db *bun.DB) *bunotel.QueryHook {
 	var database string
 	if _, err := db.NewSelect().NewRaw("SELECT CURRENT_DATABASE()").Exec(context.Background(), &database); err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err)
 	}
 
 	return bunotel.NewQueryHook(bunotel.WithDBName(database))
@@ -93,7 +94,7 @@ func setupMaxConnections(sqldb *sql.DB) {
 func createPgxConfig(config *cfg.Config) (*pgx.ConnConfig, error) {
 	connConfig, err := pgx.ParseConfig(config.Database.URL)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err)
 	}
 	connConfig.DefaultQueryExecMode = pgx.QueryExecModeSimpleProtocol
 	connConfig.RuntimeParams["application_name"] = config.AppName

@@ -6,11 +6,13 @@ import (
 	"sync"
 )
 
-var FileName = "config.yml"
+var FileName = "config.yaml"
 
 type Config struct {
-	AppName  string   `yaml:"app_name"`
-	Debug    bool     `yaml:"debug"`
+	AppName string `yaml:"appName"`
+
+	LogLevel string `yaml:"logLevel"`
+
 	Database Database `yaml:"database"`
 }
 
