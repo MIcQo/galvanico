@@ -1,9 +1,10 @@
 package config
 
 import (
-	"github.com/rs/zerolog/log"
 	"os"
 	"sync"
+
+	"github.com/rs/zerolog/log"
 
 	"gopkg.in/yaml.v3"
 )
