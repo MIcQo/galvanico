@@ -3,9 +3,6 @@
   "dependencyDashboard": true,
   "dependencyDashboardOSVVulnerabilitySummary": "all",
   "osvVulnerabilityAlerts": true,
-  "repositories": [
-    "MIcQo/galvanico"
-  ],
   "vulnerabilityAlerts": {
     "description": "Settings specific to PRs of type security",
     "addLabels": [
