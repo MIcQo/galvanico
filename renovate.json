@@ -18,14 +18,6 @@
   ],
   "packageRules": [
     {
-      "description": "Define the label to make Renovate stop updating a PR.",
-      "stopUpdatingLabel": "renovate:stop-updating"
-    },
-    {
-      "description": "Define the label to make Renovate rebase a PR.",
-      "rebaseLabel": "renovate:do-rebase"
-    },
-    {
       "description": "Define labels of the dependency dashboard issues.",
       "dependencyDashboardLabels": [
         "dependencies"
