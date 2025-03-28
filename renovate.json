@@ -1,9 +1,119 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "dependencyDashboard": true,
+  "dependencyDashboardOSVVulnerabilitySummary": "all",
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "description": "Settings specific to PRs of type security",
+    "addLabels": [
+      "security"
+    ]
+  },
   "extends": [
-    "config:base"
+    "config:best-practices",
+    ":gitSignOff",
+    ":labels(dependencies)",
+    "security:openssf-scorecard",
+    "mergeConfidence:all-badges"
   ],
-  "postUpdateOptions": [
-    "gomodTidy",
-    "gomodUpdateImportPaths"
+  "packageRules": [
+    {
+      "description": "Define the label to make Renovate stop updating a PR.",
+      "stopUpdatingLabel": "renovate:stop-updating"
+    },
+    {
+      "description": "Define the label to make Renovate rebase a PR.",
+      "rebaseLabel": "renovate:do-rebase"
+    },
+    {
+      "description": "Define labels of the dependency dashboard issues.",
+      "dependencyDashboardLabels": [
+        "dependencies"
+      ]
+    },
+    {
+      "description": "Add label major to PRs with major updates",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "addLabels": [
+        "major"
+      ]
+    },
+    {
+      "description": "Add labels for PRs related to javascript",
+      "matchDatasources": [
+        "node-version",
+        "npm"
+      ],
+      "addLabels": [
+        "javascript"
+      ]
+    },
+    {
+      "description": "Add labels for PRs related to go",
+      "matchDatasources": [
+        "golang-version",
+        "go"
+      ],
+      "addLabels": [
+        "go"
+      ]
+    },
+    {
+      "description": "Enable updates from specified datasources",
+      "matchDatasources": [
+        "node-version",
+        "golang-version"
+      ],
+      "enabled": true
+    },
+    {
+      "description": "Enable updates from specified go modules",
+      "matchDatasources": [
+        "go"
+      ],
+      "matchPackageNames": [
+        "github.com/golangci/golangci-lint"
+      ],
+      "enabled": true
+    },
+    {
+      "description": "Group golang-version packages",
+      "groupName": "group golang",
+      "matchDatasources": [
+        "docker",
+        "golang-version"
+      ],
+      "matchPackageNames": [
+        "/(?:^|/)golang$/"
+      ]
+    },
+    {
+      "description": "Group node-version packages",
+      "groupName": "group node",
+      "matchDatasources": [
+        "docker",
+        "node-version"
+      ],
+      "matchPackageNames": [
+        "/(?:^|/)node$/",
+        "!calico/node",
+        "!docker.io/calico/node",
+        "!kindest/node"
+      ]
+    },
+    {
+      "description": "Example to reduce noise with the automerge features.",
+      "matchDatasources": [
+        "golang-version"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "automerge": false
+    }
   ]
 }
