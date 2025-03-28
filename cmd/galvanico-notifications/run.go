@@ -1,7 +1,6 @@
-package galvanico_notification
+package galvaniconotification
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 )
 
@@ -10,11 +9,9 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("serve called")
+	Run: func(_ *cobra.Command, _ []string) {
 	},
 }
 
 func init() {
-	runCmd.PersistentFlags().IntP("port", "p", 8082, "port to serve on")
 }

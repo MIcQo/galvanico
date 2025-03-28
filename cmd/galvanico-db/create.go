@@ -1,9 +1,11 @@
-package galvanico_db
+package galvanicodb
 
 import (
-	"fmt"
-	"github.com/spf13/cobra"
 	"strings"
+
+	"github.com/rs/zerolog/log"
+
+	"github.com/spf13/cobra"
 )
 
 // createCmd represents the serve command
@@ -17,7 +19,7 @@ var createCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Printf("created migration %s (%s)\n", mf.Name, mf.Path)
+		log.Info().Msgf("created migration %s (%s)\n", mf.Name, mf.Path)
 		return nil
 	},
 }

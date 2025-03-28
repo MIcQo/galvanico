@@ -1,22 +1,25 @@
-package galvanico_server
+package galvanicoserver
 
 import (
 	"fmt"
 	"galvanico/internal/server"
-	"github.com/gofiber/fiber/v2"
-	"github.com/rs/zerolog/log"
-	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/cobra"
 )
+
+const defaultPort = 8080
 
 // ServeCmd represents the serve command
 var ServeCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 
 		var srv = server.NewServer()
 		var port = cmd.Flag("port").Value.String()
@@ -35,7 +38,7 @@ var ServeCmd = &cobra.Command{
 }
 
 func init() {
-	ServeCmd.PersistentFlags().IntP("port", "p", 8080, "port to serve on")
+	ServeCmd.PersistentFlags().IntP("port", "p", defaultPort, "port to serve on")
 }
 
 func startServer(srv *fiber.App, port string) {

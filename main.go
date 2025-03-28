@@ -3,10 +3,11 @@ package main
 import (
 	"galvanico/cmd"
 	"galvanico/internal/config"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"os"
 	"time"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
@@ -24,7 +25,10 @@ func main() {
 
 	var formatter = zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339, TimeLocation: time.UTC}
 
-	log.Logger = log.Output(formatter).With().Timestamp().Logger()
+	log.Logger = log.Output(formatter). //nolint:reassign // because we need to set default log for app
+						With().
+						Timestamp().
+						Logger()
 
 	if zerolog.GlobalLevel() == zerolog.DebugLevel {
 		log.Debug().Msg("Debug logging enabled")

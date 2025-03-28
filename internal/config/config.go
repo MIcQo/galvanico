@@ -1,9 +1,10 @@
 package config
 
 import (
-	"gopkg.in/yaml.v3"
 	"os"
 	"sync"
+
+	"gopkg.in/yaml.v3"
 )
 
 var FileName = "config.yaml"

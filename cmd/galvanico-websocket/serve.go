@@ -1,7 +1,6 @@
-package galvanico_websocket
+package galvanicowebsocket
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 )
 
@@ -10,8 +9,7 @@ var WsCmd = &cobra.Command{
 	Use:   "ws",
 	Short: "",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("serve called")
+	Run: func(_ *cobra.Command, _ []string) {
 	},
 }
 

@@ -2,17 +2,14 @@ package migrations
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/uptrace/bun"
 )
 
 func init() {
-	Migrations.MustRegister(func(ctx context.Context, db *bun.DB) error {
-		fmt.Print(" [up migration] ")
+	Migrations.MustRegister(func(_ context.Context, _ *bun.DB) error {
 		return nil
-	}, func(ctx context.Context, db *bun.DB) error {
-		fmt.Print(" [down migration] ")
+	}, func(_ context.Context, _ *bun.DB) error {
 		return nil
 	})
 }

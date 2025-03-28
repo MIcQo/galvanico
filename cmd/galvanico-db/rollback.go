@@ -1,17 +1,18 @@
-package galvanico_db
+package galvanicodb
 
 import (
 	"context"
+
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/uptrace/bun/migrate"
 )
 
-// rollbackCmd represents the serve command
+// rollbackCmd represents the serve command.
 var rollbackCmd = &cobra.Command{
 	Use:   "rollback",
 	Short: "rollback the last migration group",
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(cmd *cobra.Command, _ []string) error {
 		var ctx = cmd.Context()
 		if err := migrator.Lock(ctx); err != nil {
 			return err
@@ -21,7 +22,7 @@ var rollbackCmd = &cobra.Command{
 			if err != nil {
 				log.Panic().Err(err).Msg("failed to unlock migration group")
 			}
-		}(migrator, ctx) //nolint:errcheck
+		}(migrator, ctx)
 
 		group, err := migrator.Rollback(ctx)
 		if err != nil {

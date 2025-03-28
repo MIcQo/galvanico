@@ -4,6 +4,9 @@ import (
 	"context"
 	"database/sql"
 	cfg "galvanico/internal/config"
+	"runtime"
+	"sync"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/rs/zerolog/log"
@@ -11,9 +14,9 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/extra/bundebug"
 	"github.com/uptrace/bun/extra/bunotel"
-	"runtime"
-	"sync"
 )
+
+const cpuMultiplier = 4
 
 var once sync.Once
 var conn *bun.DB
@@ -85,7 +88,7 @@ func addQueryTelemetry(db *bun.DB) *bunotel.QueryHook {
 }
 
 func setupMaxConnections(sqldb *sql.DB) {
-	maxOpenConns := 4 * runtime.GOMAXPROCS(0)
+	maxOpenConns := cpuMultiplier * runtime.GOMAXPROCS(0)
 	sqldb.SetMaxOpenConns(maxOpenConns)
 	sqldb.SetMaxIdleConns(maxOpenConns)
 }

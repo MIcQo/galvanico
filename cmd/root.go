@@ -16,7 +16,7 @@ var rootCmd = &cobra.Command{
 	Use:   "galvanico",
 	Short: "Game CLI",
 	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-		config.FileName = cmd.Flag("config").Value.String()
+		config.FileName = cmd.Flag("config").Value.String() //nolint:reassign // we need to set config
 
 		if _, err := config.Load(); err != nil {
 			return err
@@ -24,7 +24,7 @@ var rootCmd = &cobra.Command{
 
 		return database.Connection().Ping()
 	},
-	PersistentPostRunE: func(cmd *cobra.Command, _ []string) error {
+	PersistentPostRunE: func(_ *cobra.Command, _ []string) error {
 		return database.Close()
 	},
 }

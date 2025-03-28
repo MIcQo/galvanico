@@ -1,8 +1,9 @@
-package galvanico_db
+package galvanicodb
 
 import (
 	"galvanico/internal/database"
 	"galvanico/migrations"
+
 	"github.com/spf13/cobra"
 	"github.com/uptrace/bun/migrate"
 )
@@ -14,7 +15,7 @@ var DBCmd = &cobra.Command{
 	Use:   "db",
 	Short: "",
 	Long:  ``,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
 		var db = database.Connection()
 		migrator = migrate.NewMigrator(db, migrations.Migrations)
 		return nil

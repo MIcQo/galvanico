@@ -1,7 +1,6 @@
-package galvanico_notification
+package galvaniconotification
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 )
 
@@ -10,8 +9,8 @@ var NotificationCmd = &cobra.Command{
 	Use:   "notification",
 	Short: "",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("serve called")
+	Run: func(_ *cobra.Command, _ []string) {
+
 	},
 }
 

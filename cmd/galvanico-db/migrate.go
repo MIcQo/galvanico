@@ -1,7 +1,8 @@
-package galvanico_db
+package galvanicodb
 
 import (
 	"context"
+
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/uptrace/bun/migrate"
@@ -11,7 +12,7 @@ import (
 var migrateCmd = &cobra.Command{
 	Use:   "migrate",
 	Short: "migrate database",
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(cmd *cobra.Command, _ []string) error {
 		var ctx = cmd.Context()
 		if err := migrator.Lock(ctx); err != nil {
 			return err
@@ -21,7 +22,7 @@ var migrateCmd = &cobra.Command{
 			if err != nil {
 				log.Panic().Err(err).Msg("failed to unlock migration group")
 			}
-		}(migrator, ctx) //nolint:errcheck
+		}(migrator, ctx)
 
 		group, err := migrator.Migrate(ctx)
 		if err != nil {
