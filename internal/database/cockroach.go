@@ -71,7 +71,6 @@ func registerHooks(db *bun.DB, cfg *cfg.Config) {
 
 func addQueryLogger(config *cfg.Config) *bundebug.QueryHook {
 	return bundebug.NewQueryHook(
-		// disable the hook
 		bundebug.WithEnabled(config.LogLevel == "debug"),
 	)
 }

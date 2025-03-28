@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	galvanicodb "galvanico/cmd/galvanico-db"
 	galvaniconotification "galvanico/cmd/galvanico-notifications"
 	galvanicoserver "galvanico/cmd/galvanico-server"
 	galvanicowebsocket "galvanico/cmd/galvanico-websocket"
@@ -41,4 +42,5 @@ func init() {
 	rootCmd.AddCommand(galvanicoserver.ServeCmd)
 	rootCmd.AddCommand(galvanicowebsocket.WsCmd)
 	rootCmd.AddCommand(galvaniconotification.NotificationCmd)
+	rootCmd.AddCommand(galvanicodb.DBCmd)
 }
