@@ -18,12 +18,6 @@
   ],
   "packageRules": [
     {
-      "description": "Define labels of the dependency dashboard issues.",
-      "dependencyDashboardLabels": [
-        "dependencies"
-      ]
-    },
-    {
       "description": "Add label major to PRs with major updates",
       "matchUpdateTypes": [
         "major"
