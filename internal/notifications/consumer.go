@@ -10,9 +10,15 @@ import (
 
 const msgBuffer = 1000
 
-func NewConsumer(ctx context.Context) error {
+func NewConsumer(ctx context.Context, channel string) error {
+	if channel == "" {
+		channel = "channels.*"
+	} else {
+		channel = "channels." + channel
+	}
+
 	var messages = make(chan *nats.Msg, msgBuffer)
-	var sub, err = broker.Connection().ChanSubscribe("channels.*", messages)
+	var sub, err = broker.Connection().ChanSubscribe(channel, messages)
 	if err != nil {
 		return err
 	}

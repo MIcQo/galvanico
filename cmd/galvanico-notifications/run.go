@@ -12,9 +12,14 @@ var runCmd = &cobra.Command{
 	Short: "",
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, _ []string) error {
-		return notifications.NewConsumer(cmd.Context())
+		var channel, err = cmd.Flags().GetString("channel")
+		if err != nil {
+			return err
+		}
+		return notifications.NewConsumer(cmd.Context(), channel)
 	},
 }
 
 func init() {
+	runCmd.Flags().String("channel", "", "channel name")
 }
