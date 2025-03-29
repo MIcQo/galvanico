@@ -29,6 +29,6 @@ jobs:
           go test -v ./... | go-junit-report -set-exit-code > report.xml
 
       - name: Test Summary
-        uses: test-summary/action@v1
+        uses: test-summary/action@31493c76ec9e7aa675f1585d3ed6f1da69269a86 # v2
         with:
           paths: report.xml
