@@ -5,6 +5,7 @@ import (
 	galvaniconotification "galvanico/cmd/galvanico-notifications"
 	galvanicoserver "galvanico/cmd/galvanico-server"
 	galvanicowebsocket "galvanico/cmd/galvanico-websocket"
+	"galvanico/internal/broker"
 	"galvanico/internal/config"
 	"galvanico/internal/database"
 	"galvanico/internal/logging"
@@ -34,11 +35,17 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
+		broker.Connection()
+
 		defer log.Info().Msg("Setup complete")
 
 		return database.Connection().Ping()
 	},
 	PersistentPostRunE: func(_ *cobra.Command, _ []string) error {
+		if err := broker.Close(); err != nil {
+			return err
+		}
+
 		return database.Close()
 	},
 }

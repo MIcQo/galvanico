@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/nats-io/nats.go"
 	"os"
 	"sync"
 
@@ -15,9 +16,14 @@ type Config struct {
 	AppName  string   `yaml:"appName"`
 	LogLevel string   `yaml:"logLevel"`
 	Database Database `yaml:"database"`
+	Broker   Broker   `yaml:"broker"`
 }
 
 type Database struct {
+	URL string `yaml:"url"`
+}
+
+type Broker struct {
 	URL string `yaml:"url"`
 }
 
@@ -40,6 +46,9 @@ func newDefaultConfig() *Config {
 		Database: Database{
 			// default postgres config, which should fail on other than local env
 			URL: "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable",
+		},
+		Broker: Broker{
+			URL: nats.DefaultURL,
 		},
 	}
 }

@@ -4,3 +4,6 @@ logLevel: debug
 
 database:
   url: "postgresql://root@127.0.0.1:26257/defaultdb?sslmode=disable"
+
+broker:
+  url: "nats://127.0.0.1:4222"
