@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5
         with:
           go-version: '1.24.x'
 
@@ -29,6 +29,6 @@ jobs:
           go test -v ./... | go-junit-report -set-exit-code > report.xml
 
       - name: Test Summary
-        uses: test-summary/action@v1
+        uses: test-summary/action@77bb5a9f9c572416423f9a157cbf1159c1e75a4c # v1
         with:
           paths: report.xml
