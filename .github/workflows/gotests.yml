@@ -21,8 +21,16 @@ jobs:
       - name: Install dependencies
         run: go get .
 
-      - uses: brian-pickens/go-test-report@v1
+      - name: Generate Mocks and Run Tests
+        working-directory: ${{ env.MICROSERVICE_LOCATION }}
+        run: |
+          export GOPATH="$HOME/go/"
+          export PATH=$PATH:$GOPATH/bin
+          go install github.com/jstemmer/go-junit-report@latest
+          go test -v ./... | go-junit-report -set-exit-code > report.xml          
+
+      - name: Test Summary
+        uses: test-summary/action@v1
         with:
-          packages: "./..."
-          summary: "true"
-          GO111MODULE: "auto"
+          paths: |
+            ${{ env.MICROSERVICE_LOCATION }}/report.xml
