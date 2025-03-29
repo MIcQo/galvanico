@@ -22,7 +22,6 @@ jobs:
         run: go get .
 
       - name: Generate Mocks and Run Tests
-        working-directory: ${{ env.MICROSERVICE_LOCATION }}
         run: |
           export GOPATH="$HOME/go/"
           export PATH=$PATH:$GOPATH/bin
