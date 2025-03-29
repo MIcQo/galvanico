@@ -1,24 +1,35 @@
 package galvanicodb
 
 import (
+	"galvanico/internal/config"
 	"galvanico/internal/database"
-	"galvanico/migrations"
+	"galvanico/internal/logging"
 
 	"github.com/spf13/cobra"
-	"github.com/uptrace/bun/migrate"
 )
-
-var migrator *migrate.Migrator
 
 // DBCmd represents the serve command
 var DBCmd = &cobra.Command{
 	Use:   "db",
 	Short: "",
 	Long:  ``,
-	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
-		var db = database.Connection()
-		migrator = migrate.NewMigrator(db, migrations.Migrations)
-		return nil
+	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+		config.FileName = cmd.Flag("config").Value.String() //nolint:reassign // we need to set config
+
+		if err := logging.Setup(); err != nil {
+			return err
+		}
+
+		var cfg, cfgErr = config.Load()
+		if cfgErr != nil {
+			return cfgErr
+		}
+
+		if err := logging.SetupLevel(cfg); err != nil {
+			return err
+		}
+
+		return database.Connection().Ping()
 	},
 }
 
