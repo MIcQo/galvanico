@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"errors"
 	"galvanico/internal/config"
 	"sync"
 
@@ -22,6 +23,8 @@ func Connection() *nats.Conn {
 			panic(err)
 		}
 
+		ns.SetErrorHandler(natsErrHandler)
+
 		broker = ns
 		log.Debug().Str("uri", cfg.Broker.URL).Msg("connected to broker")
 	})
@@ -36,4 +39,25 @@ func Close() error {
 
 	broker.Close()
 	return nil
+}
+
+func natsErrHandler(_ *nats.Conn, sub *nats.Subscription, natsErr error) {
+	log.Err(natsErr)
+
+	if errors.Is(natsErr, nats.ErrSlowConsumer) {
+		pendingMsgs, _, err := sub.Pending()
+		if err != nil {
+			log.Error().Err(err).
+				Str("subject", sub.Subject).
+				Msg("could not get pending messages")
+			return
+		}
+
+		log.Warn().
+			Str("subject", sub.Subject).
+			Int("pending", pendingMsgs).
+			Msg("slow consumer, pending messages")
+
+		// TODO: Log error, notify operations...
+	}
 }
