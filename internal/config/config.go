@@ -27,14 +27,13 @@ var cfg *Config
 func Load() (*Config, error) {
 	var outputErr error
 	once.Do(func() {
-		cfg, outputErr = loadFile()
+		cfg, outputErr = loadFile(FileName)
 	})
 
 	return cfg, outputErr
 }
 
 func newDefaultConfig() *Config {
-	log.Warn().Msg("using default config, please define your own")
 	return &Config{
 		AppName:  "app",
 		LogLevel: "info",
@@ -45,19 +44,19 @@ func newDefaultConfig() *Config {
 	}
 }
 
-func fileExists(filename string) bool {
-	_, err := os.Stat(filename)
-	return os.IsExist(err)
-}
+func loadFile(filename string) (*Config, error) {
+	log.Info().Str("filename", filename).Msg("loading config file")
 
-func loadFile() (*Config, error) {
-	log.Debug().Str("filename", FileName).Msg("loading config file")
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		log.Warn().
+			Str("filename", filename).
+			Bool("exists", false).
+			Msg("using default config, please define your own")
 
-	if !fileExists(FileName) {
 		return newDefaultConfig(), nil
 	}
 
-	var file, err = os.ReadFile(FileName)
+	var file, err = os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}

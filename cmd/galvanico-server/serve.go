@@ -20,7 +20,6 @@ var ServeCmd = &cobra.Command{
 	Short: "",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, _ []string) {
-
 		var srv = server.NewServer()
 		var port = cmd.Flag("port").Value.String()
 
