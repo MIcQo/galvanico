@@ -33,6 +33,10 @@ func Connection() *nats.Conn {
 }
 
 func Close() error {
+	if broker == nil {
+		return nil
+	}
+
 	if err := broker.Drain(); err != nil {
 		return err
 	}
