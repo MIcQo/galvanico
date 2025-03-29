@@ -1,9 +1,10 @@
 package config
 
 import (
-	"github.com/nats-io/nats.go"
 	"os"
 	"sync"
+
+	"github.com/nats-io/nats.go"
 
 	"github.com/rs/zerolog/log"
 

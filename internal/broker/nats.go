@@ -2,9 +2,10 @@ package broker
 
 import (
 	"galvanico/internal/config"
+	"sync"
+
 	"github.com/nats-io/nats.go"
 	"github.com/rs/zerolog/log"
-	"sync"
 )
 
 var broker *nats.Conn

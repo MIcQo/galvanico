@@ -1,6 +1,8 @@
 package galvaniconotification
 
 import (
+	"galvanico/internal/notifications"
+
 	"github.com/spf13/cobra"
 )
 
@@ -9,7 +11,8 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "",
 	Long:  ``,
-	Run: func(_ *cobra.Command, _ []string) {
+	RunE: func(cmd *cobra.Command, _ []string) error {
+		return notifications.NewConsumer(cmd.Context())
 	},
 }
 
