@@ -26,7 +26,7 @@ var sendCmd = &cobra.Command{
 			repetations = 1
 		}
 
-		for i := 0; i < repetations; i++ {
+		for range repetations {
 			if sendErr := notifications.NewPublisher(args[0], []byte(strings.Join(args[1:], " "))); sendErr != nil {
 				log.Panic().Err(sendErr).Msg("unable to send message")
 			}
