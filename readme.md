@@ -67,21 +67,27 @@ Galvanico is an open-source, browser-based strategy game inspired by Ikariam, bu
 We welcome contributions from the community! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute.
 
 ### Project Structure
+
+```
 galvanico/
+├── cmd/             # Go commands
 ├── client/          # Frontend code (Vue 3, etc.)
 ├── server/          # Backend code (Go)
-├── common/          # Shared code between client and server (if any)
-├── assets/          # Images, sounds, and other assets
+├── internal/        # Internal code between server parts (if any)
 ├── docs/            # Documentation
+├── migrations/      # Migration files
 ├── CONTRIBUTING.md  # Contribution guidelines
 ├── LICENSE          # License information
 └── README.md        # This file
+```
 
 ### Technologies Used
 
 * **Frontend:** [Vue 3](https://vuejs.org/) , [TypeScript](https://www.typescriptlang.org/)
 * **Backend:** [Go](https://golang.org/)
-* **Database:** [PostgreSQL](https://www.postgresql.org/) (or your preferred database)
+* **Database:** [PostgreSQL](https://www.postgresql.org/) (actually, we
+  use [CockroachDB](https://github.com/cockroachdb/cockroach))
+* **Broker:** [NATS](https://github.com/nats-io/nats-server)
 
 ## Contributing
 
@@ -97,7 +103,7 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## License
 
-Galvanico is released under the [MIT License](LICENSE).
+Galvanico is released under the [Apache 2.0 License](LICENSE).
 
 ## Acknowledgments
 
