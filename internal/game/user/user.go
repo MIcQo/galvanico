@@ -2,9 +2,10 @@ package user
 
 import (
 	"database/sql"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
-	"time"
 )
 
 type User struct {
