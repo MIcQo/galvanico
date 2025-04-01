@@ -4,6 +4,8 @@ import (
 	"galvanico/internal/config"
 	"time"
 
+	"github.com/goccy/go-json"
+
 	"github.com/gofiber/contrib/fiberzerolog"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
@@ -22,6 +24,8 @@ func NewServer() *fiber.App {
 	var app = fiber.New(fiber.Config{
 		AppName:     cfg.AppName,
 		IdleTimeout: idleTimeout,
+		JSONDecoder: json.Unmarshal,
+		JSONEncoder: json.Marshal,
 	})
 
 	app.Use(fiberzerolog.New(fiberzerolog.Config{
