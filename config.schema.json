@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$ref": "#/definitions/galvanico",
+  "definitions": {
+    "galvanico": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "appName": {
+          "type": "string"
+        },
+        "logLevel": {
+          "type": "string",
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "database": {
+          "$ref": "#/definitions/Database"
+        },
+        "broker": {
+          "$ref": "#/definitions/Broker"
+        },
+        "world": {
+          "$ref": "#/definitions/World"
+        },
+        "auth": {
+          "$ref": "#/definitions/Auth"
+        }
+      },
+      "required": [
+        "appName",
+        "broker",
+        "database",
+        "logLevel",
+        "world"
+      ],
+      "title": "galvanico"
+    },
+    "Broker": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "Broker"
+    },
+    "Database": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "Broker"
+    },
+    "World": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "travelSpeed": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 4
+        }
+      },
+      "title": "World"
+    },
+    "Auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": [
+            "zitadel",
+            "other"
+          ],
+          "default": "zitadel"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "provider": {
+                "const": "zitadel"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "settings": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "domain": {
+                    "type": "string"
+                  },
+                  "clientId": {
+                    "type": "string"
+                  },
+                  "insecure": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                },
+                "required": [
+                  "domain",
+                  "clientId"
+                ]
+              }
+            },
+            "required": [
+              "settings"
+            ]
+          }
+        }
+      ],
+      "required": [
+        "provider"
+      ]
+    }
+  }
+}

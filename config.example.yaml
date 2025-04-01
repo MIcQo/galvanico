@@ -1,3 +1,5 @@
+$schema: "config.schema.json"
+
 appName: "Galvanico"
 
 logLevel: debug
@@ -7,3 +9,12 @@ database:
 
 broker:
   url: "nats://127.0.0.1:4222"
+
+auth:
+  provider: zitadel
+  settings:
+    clientId: a
+    domain: a
+
+world:
+  travelSpeed: 1
