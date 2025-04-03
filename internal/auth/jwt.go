@@ -2,9 +2,10 @@ package auth
 
 import (
 	"galvanico/internal/config"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"time"
 )
 
 const tokenExpiration = time.Hour * 24

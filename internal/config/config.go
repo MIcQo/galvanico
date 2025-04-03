@@ -37,7 +37,11 @@ func (a *Auth) GetJWTKey() []byte {
 		a.Settings["key"] = key
 		log.Warn().
 			Str("key", a.Settings["key"]).
-			Msg(`field 'key' in 'auth.settings' was not found or is empty, defaulting to random key, if application would be restarted, then every issued token would be invalid and every user should re-authorize. Please set static key to 'auth.settings.key'`)
+			Msg(
+				"field 'key' in 'auth.settings' was not found or is empty, defaulting to random key, if application " +
+					"would be restarted, then every issued token would be invalid and every user should re-authorize. " +
+					"Please set static key to 'auth.settings.key'",
+			)
 	}
 
 	return []byte(key)
