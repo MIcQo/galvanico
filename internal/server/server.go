@@ -4,11 +4,10 @@ import (
 	"galvanico/internal/broker"
 	"galvanico/internal/config"
 	"galvanico/internal/database"
-	"github.com/ansrivas/fiberprometheus/v2"
 	"time"
 
+	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/goccy/go-json"
-
 	"github.com/gofiber/contrib/fiberzerolog"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
@@ -58,7 +57,6 @@ func registerUnauthorizedRoutes(app *fiber.App, cfg *config.Config) {
 	prometheus.RegisterAt(app, "/metrics")
 	prometheus.SetSkipPaths([]string{"/ping", "/readyz", "/livez"})
 	app.Use(prometheus.Middleware)
-
 }
 
 func registerAuthorizedRoutes(_ *fiber.App, _ *config.Config) {
