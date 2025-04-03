@@ -46,11 +46,11 @@ func NewServer() *fiber.App {
 
 func registerUnauthorizedRoutes(app *fiber.App, cfg *config.Config) {
 	app.Use(healthcheck.New(healthcheck.Config{
-		LivenessProbe: func(ctx *fiber.Ctx) bool {
+		LivenessProbe: func(_ *fiber.Ctx) bool {
 			return true
 		},
 		ReadinessProbe: func(ctx *fiber.Ctx) bool {
-			return database.Connection().Ping() == nil && broker.Connection().IsConnected()
+			return database.Connection().PingContext(ctx.Context()) == nil && broker.Connection().IsConnected()
 		},
 	}))
 
