@@ -1,7 +1,10 @@
 package server
 
 import (
+	"galvanico/internal/broker"
 	"galvanico/internal/config"
+	"galvanico/internal/database"
+	"github.com/ansrivas/fiberprometheus/v2"
 	"time"
 
 	"github.com/goccy/go-json"
@@ -32,9 +35,32 @@ func NewServer() *fiber.App {
 		Logger: &log.Logger,
 	}))
 
-	app.Use(healthcheck.New())
 	app.Use(requestid.New())
 	app.Use(recover.New())
 
+	registerUnauthorizedRoutes(app, cfg)
+	registerAuthorizedRoutes(app, cfg)
+
 	return app
+}
+
+func registerUnauthorizedRoutes(app *fiber.App, cfg *config.Config) {
+	app.Use(healthcheck.New(healthcheck.Config{
+		LivenessProbe: func(ctx *fiber.Ctx) bool {
+			return true
+		},
+		ReadinessProbe: func(ctx *fiber.Ctx) bool {
+			return database.Connection().Ping() == nil && broker.Connection().IsConnected()
+		},
+	}))
+
+	prometheus := fiberprometheus.NewWithDefaultRegistry(cfg.AppName)
+	prometheus.RegisterAt(app, "/metrics")
+	prometheus.SetSkipPaths([]string{"/ping", "/readyz", "/livez"})
+	app.Use(prometheus.Middleware)
+
+}
+
+func registerAuthorizedRoutes(_ *fiber.App, _ *config.Config) {
+
 }
