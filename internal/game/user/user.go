@@ -11,7 +11,7 @@ import (
 type User struct {
 	bun.BaseModel `bun:"table:users,alias:u"`
 
-	ID            uuid.UUID
+	ID            uuid.UUID `bun:"type:uuid,pk,default:gen_random_uuid()"`
 	ExternalID    sql.NullInt64
 	Status        string
 	Username      string
@@ -24,6 +24,6 @@ type User struct {
 	UpdatedAt     sql.NullTime
 	DeletedAt     sql.NullTime
 
-	Features []Feature `bun:"rel:has-many"`
-	Resource Resource  `bun:"rel:has-one"`
+	Features  []Feature `bun:"rel:has-many"`
+	Resources Resources `bun:"rel:has-one"`
 }

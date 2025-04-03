@@ -10,7 +10,7 @@ CREATE TABLE "users"
     "ban_expiration" timestamp,
     "ban_reason"     string,
     "created_at"     timestamp                 DEFAULT (now()),
-    "modified_at"    timestamp,
+    "updated_at" timestamp,
     "deleted_at"     timestamp
 );
 
