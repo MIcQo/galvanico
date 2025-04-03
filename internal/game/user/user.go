@@ -23,4 +23,7 @@ type User struct {
 	CreatedAt     time.Time
 	UpdatedAt     sql.NullTime
 	DeletedAt     sql.NullTime
+
+	Features []Feature `bun:"rel:has-many"`
+	Resource Resource  `bun:"rel:has-one"`
 }
