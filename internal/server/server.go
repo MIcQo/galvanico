@@ -5,13 +5,14 @@ import (
 	"galvanico/internal/broker"
 	"galvanico/internal/config"
 	"galvanico/internal/database"
-	"github.com/rs/zerolog"
 	"time"
+
+	"github.com/rs/zerolog"
 
 	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/contrib/fiberzerolog"
-	"github.com/gofiber/contrib/jwt"
+	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/recover"

@@ -6,6 +6,7 @@ import (
 	"galvanico/internal/config"
 	"galvanico/internal/database"
 	"galvanico/internal/game/user"
+
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 )
