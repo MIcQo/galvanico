@@ -5,7 +5,7 @@ go 1.24.1
 require (
 	github.com/ansrivas/fiberprometheus/v2 v2.9.1
 	github.com/goccy/go-json v0.10.5
-	github.com/gofiber/contrib/fiberzerolog v1.0.2
+	github.com/gofiber/contrib/fiberzerolog v1.0.3
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.4
