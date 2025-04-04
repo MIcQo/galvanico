@@ -21,10 +21,10 @@ var migrateCmd = &cobra.Command{
 				return err
 			}
 			if group.IsZero() {
-				log.Info().Msgf("there are no new migrations to run (database is up to date)\n")
+				log.Info().Msgf("there are no new migrations to run (database is up to date)")
 				return nil
 			}
-			log.Info().Msgf("migrated to %s\n", group)
+			log.Info().Msgf("migrated to %s", group)
 			return nil
 		})
 	},
