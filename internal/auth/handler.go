@@ -47,6 +47,7 @@ func LoginHandler(ctx *fiber.Ctx) error {
 	})
 }
 
+// ErrorHandler handles JWT unsuccessful request
 func ErrorHandler(_ *fiber.Ctx, err error) error {
 	if errors.Is(err, jwtware.ErrJWTMissingOrMalformed) {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid credentials")
