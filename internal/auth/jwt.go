@@ -10,6 +10,7 @@ import (
 
 const tokenExpiration = time.Hour * 24
 
+// GenerateJWT creates new signed token
 func GenerateJWT(cfg *config.Config, id uuid.UUID) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
