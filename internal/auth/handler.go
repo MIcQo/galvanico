@@ -15,15 +15,16 @@ type authRequest struct {
 	Username string `json:"username"`
 }
 
+// LoginHandler handles login request
 func LoginHandler(ctx *fiber.Ctx) error {
 	var cfg, cfgErr = config.Load()
 	if cfgErr != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": cfgErr.Error()})
+		return fiber.NewError(fiber.StatusInternalServerError, cfgErr.Error())
 	}
 
 	var req authRequest
 	if err := ctx.BodyParser(&req); err != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
 	var repo = user.NewUserRepository(database.Connection())
@@ -31,14 +32,14 @@ func LoginHandler(ctx *fiber.Ctx) error {
 	if err != nil {
 		// if errors.Is(err, pgx.ErrNoRows) {
 		if errors.Is(err, sql.ErrNoRows) {
-			return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid credentials"})
+			return fiber.NewError(fiber.StatusUnauthorized, "invalid credentials")
 		}
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	var jwt, jwtErr = GenerateJWT(cfg, usr.ID)
 	if jwtErr != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": jwtErr.Error()})
+		return fiber.NewError(fiber.StatusInternalServerError, jwtErr.Error())
 	}
 
 	return ctx.JSON(fiber.Map{
@@ -46,9 +47,9 @@ func LoginHandler(ctx *fiber.Ctx) error {
 	})
 }
 
-func ErrorHandler(c *fiber.Ctx, err error) error {
+func ErrorHandler(_ *fiber.Ctx, err error) error {
 	if errors.Is(err, jwtware.ErrJWTMissingOrMalformed) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+		return fiber.NewError(fiber.StatusBadRequest, "invalid credentials")
 	}
-	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "unauthorized"})
+	return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 }
