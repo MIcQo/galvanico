@@ -20,7 +20,7 @@ var rollbackCmd = &cobra.Command{
 				log.Info().Msg("there are no groups to roll back")
 				return nil
 			}
-			log.Info().Msgf("rolled back %s\n", group)
+			log.Info().Msgf("rolled back %s", group)
 			return nil
 		})
 	},
