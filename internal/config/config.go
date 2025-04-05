@@ -67,7 +67,7 @@ func Load() (*Config, error) {
 	return cfg, outputErr
 }
 
-func newDefaultConfig() *Config {
+func NewDefaultConfig() *Config {
 	return &Config{
 		AppName:  "app",
 		LogLevel: "info",
@@ -96,7 +96,7 @@ func loadFile(filename string) (*Config, error) {
 			Bool("exists", false).
 			Msg("using default config, please define your own")
 
-		return newDefaultConfig(), nil
+		return NewDefaultConfig(), nil
 	}
 
 	var file, err = os.ReadFile(filename)

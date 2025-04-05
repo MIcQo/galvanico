@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"galvanico/internal/config"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -55,6 +56,8 @@ func setup() (*fiber.App, *Handler) {
 		panic(parseErr)
 	}
 
+	var cfg = config.NewDefaultConfig()
+
 	var app = fiber.New()
 	var handler = NewHandler(&fakerUserRepository{data: map[string]*User{
 		"test": {
@@ -69,7 +72,7 @@ func setup() (*fiber.App, *Handler) {
 			BanExpiration: sql.NullTime{Time: banTime, Valid: true},
 			BanReason:     sql.NullString{Valid: true, String: "banned"},
 		},
-	}})
+	}}, cfg)
 
 	return app, handler
 }
