@@ -15,8 +15,9 @@ type User struct {
 	ExternalID    sql.NullInt64
 	Status        string
 	Username      string
+	Password      sql.NullString `json:"-"`
 	LastLogin     sql.NullTime
-	LastLoginIP   sql.Null[[]byte]
+	LastLoginIP   sql.NullString
 	Language      string
 	BanExpiration sql.NullTime
 	BanReason     sql.NullString
