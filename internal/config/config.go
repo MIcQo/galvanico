@@ -78,6 +78,12 @@ func newDefaultConfig() *Config {
 		Broker: Broker{
 			URL: nats.DefaultURL,
 		},
+		Auth: &Auth{
+			Provider: "jwt",
+			Settings: map[string]string{
+				"key": utils.RandomString(AuthKeyLength),
+			},
+		},
 	}
 }
 

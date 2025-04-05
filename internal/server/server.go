@@ -1,10 +1,12 @@
 package server
 
 import (
+	"errors"
 	"galvanico/internal/auth"
 	"galvanico/internal/broker"
 	"galvanico/internal/config"
 	"galvanico/internal/database"
+	"galvanico/internal/game/user"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -34,6 +36,21 @@ func NewServer() *fiber.App {
 		IdleTimeout: idleTimeout,
 		JSONDecoder: json.Unmarshal,
 		JSONEncoder: json.Marshal,
+
+		// This is default fiber error handler, but we need to change to sending json
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			// Status code defaults to 500
+			code := fiber.StatusInternalServerError
+
+			// Retrieve the custom status code if it's a *fiber.Error
+			var e *fiber.Error
+			if errors.As(err, &e) {
+				code = e.Code
+			}
+
+			// Return status code with error message
+			return c.Status(code).JSON(fiber.Map{"message": err.Error()})
+		},
 	})
 
 	app.Use(fiberzerolog.New(fiberzerolog.Config{
@@ -90,7 +107,13 @@ func registerUnauthorizedRoutes(app *fiber.App, cfg *config.Config) {
 	prometheus.SetSkipPaths([]string{"/ping", "/readyz", "/livez"})
 	app.Use(prometheus.Middleware)
 
-	app.Post("/auth/login", auth.LoginHandler)
+	var userHandler = user.NewHandler(user.NewUserRepository(database.Connection()))
+
+	var ag = app.Group("/auth")
+	{
+		ag.Post("/login", userHandler.LoginHandler)
+		ag.Post("/register", userHandler.RegisterHandler)
+	}
 }
 
 func registerAuthorizedRoutes(app *fiber.App, cfg *config.Config) {
@@ -101,14 +124,13 @@ func registerAuthorizedRoutes(app *fiber.App, cfg *config.Config) {
 		SigningKey:   jwtware.SigningKey{Key: key},
 	}))
 
-	app.Get("/authorized", func(c *fiber.Ctx) error {
-		var usr, err = auth.GetUser(c)
-		if err != nil {
-			return fiber.NewError(fiber.StatusUnauthorized, err.Error())
-		}
+	var userHandler = user.NewHandler(user.NewUserRepository(database.Connection()))
 
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"user": usr,
-		})
-	})
+	var api = app.Group("/api")
+	{
+		var usr = api.Group("/user")
+		{
+			usr.Get("", userHandler.GetHandler)
+		}
+	}
 }
