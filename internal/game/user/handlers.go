@@ -5,7 +5,6 @@ import (
 	"errors"
 	"galvanico/internal/auth"
 	"galvanico/internal/config"
-	"galvanico/internal/database"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -17,16 +16,17 @@ import (
 type Handler struct {
 	Config         *config.Config
 	UserRepository Repository
+	Service        *Service
 }
 
-func NewHandler(userRepository Repository, cfg *config.Config) *Handler {
-	return &Handler{UserRepository: userRepository, Config: cfg}
+func NewHandler(userRepository Repository, service *Service, cfg *config.Config) *Handler {
+	return &Handler{UserRepository: userRepository, Service: service, Config: cfg}
 }
 
-func (*Handler) GetHandler(c *fiber.Ctx) error {
-	var usr, err = GetUser(c)
+func (h *Handler) GetHandler(c *fiber.Ctx) error {
+	var usr, err = h.Service.GetUser(c)
 	if err != nil {
-		return fiber.NewError(fiber.StatusUnauthorized, err.Error())
+		return fiber.NewError(fiber.StatusForbidden, err.Error())
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -121,7 +121,43 @@ func (h *Handler) RegisterHandler(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{})
 }
 
-func GetUser(c *fiber.Ctx) (*User, error) {
+type usernameRequest struct {
+	Username string `json:"username"`
+}
+
+func (h *Handler) ChangeUsernameHandler(c *fiber.Ctx) error {
+	var usr, usrErr = h.Service.GetUser(c)
+	if usrErr != nil {
+		return fiber.NewError(fiber.StatusForbidden, usrErr.Error())
+	}
+
+	var req usernameRequest
+	if err := c.BodyParser(&req); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	if len(req.Username) == 0 {
+		return fiber.NewError(fiber.StatusBadRequest, "username is required")
+	}
+
+	usr.Username = req.Username
+
+	if err := h.UserRepository.ChangeUsername(c.Context(), usr); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(fiber.Map{"username": req.Username})
+}
+
+type Service struct {
+	UserRepository Repository
+}
+
+func NewService(userRepository Repository) *Service {
+	return &Service{UserRepository: userRepository}
+}
+
+func (s *Service) GetUser(c *fiber.Ctx) (*User, error) {
 	var user, userOk = c.Locals("user").(*jwt.Token)
 	if !userOk {
 		return nil, errors.New("user not authenticated")
@@ -136,9 +172,9 @@ func GetUser(c *fiber.Ctx) (*User, error) {
 	if !ok {
 		return nil, errors.New("invalid user sub")
 	}
+
 	var uid = uuid.MustParse(sub)
-	var repo = NewUserRepository(database.Connection())
-	var usr, err = repo.GetByID(c.Context(), uid)
+	var usr, err = s.UserRepository.GetByID(c.Context(), uid)
 	if err != nil {
 		return nil, err
 	}

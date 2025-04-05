@@ -5,11 +5,14 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"galvanico/internal/auth"
 	"galvanico/internal/config"
 	"io"
 	"net/http"
 	"testing"
 	"time"
+
+	jwtware "github.com/gofiber/contrib/jwt"
 
 	"github.com/stretchr/testify/require"
 
@@ -18,12 +21,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
 )
 
+const signingKey = "AToAQz1ZtiDFPd6S5O4lyPCixPpo5I58"
+
 type fakerUserRepository struct {
-	mock.Mock
 	data map[string]*User
 }
 
@@ -34,8 +37,14 @@ func (f *fakerUserRepository) GetByUsername(_ context.Context, username string) 
 	return nil, sql.ErrNoRows
 }
 
-func (f *fakerUserRepository) GetByID(_ context.Context, _ uuid.UUID) (*User, error) {
-	panic("implement me")
+func (f *fakerUserRepository) GetByID(_ context.Context, id uuid.UUID) (*User, error) {
+	for _, usr := range f.data {
+		if usr.ID.String() == id.String() {
+			return usr, nil
+		}
+	}
+
+	return nil, sql.ErrNoRows
 }
 
 func (f *fakerUserRepository) AddFeature(_ context.Context, _ *Feature) error {
@@ -47,6 +56,10 @@ func (f *fakerUserRepository) RemoveFeature(_ context.Context, _ *Feature) error
 }
 
 func (f *fakerUserRepository) UpdateLastLogin(_ context.Context, _ *User, _ string) error {
+	return nil
+}
+
+func (f *fakerUserRepository) ChangeUsername(_ context.Context, _ *User) error {
 	return nil
 }
 
@@ -72,9 +85,7 @@ func setup() (*fiber.App, *Handler) {
 	}
 
 	var cfg = config.NewDefaultConfig()
-
-	var app = fiber.New()
-	var handler = NewHandler(&fakerUserRepository{data: map[string]*User{
+	var repo = &fakerUserRepository{data: map[string]*User{
 		"test": {
 			Username: "test",
 			Password: sql.NullString{Valid: true, String: string(pass)},
@@ -87,7 +98,10 @@ func setup() (*fiber.App, *Handler) {
 			BanExpiration: sql.NullTime{Time: banTime, Valid: true},
 			BanReason:     sql.NullString{Valid: true, String: "banned"},
 		},
-	}}, cfg)
+	}}
+	var svc = NewService(repo)
+	var app = fiber.New()
+	var handler = NewHandler(repo, svc, cfg)
 
 	return app, handler
 }
@@ -238,4 +252,78 @@ func TestHandler_RegisterHandler(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, fiber.StatusBadRequest, invalidRes.StatusCode)
+}
+
+func TestHandler_ChangeUsernameHandler(t *testing.T) {
+	var app, handler = setup()
+	var cfg = config.NewDefaultConfig()
+	cfg.Auth.Settings["key"] = signingKey
+	app.Use(jwtware.New(jwtware.Config{
+		SigningKey: jwtware.SigningKey{Key: []byte(signingKey), JWTAlg: jwtware.HS256},
+	}))
+	app.Patch("/api/user/username", handler.ChangeUsernameHandler)
+
+	var reqBody, err = json.Marshal(usernameRequest{Username: gofakeit.Username()})
+	require.NoError(t, err)
+
+	req, _ := http.NewRequest(
+		http.MethodPatch,
+		"/api/user/username",
+		bytes.NewReader(reqBody),
+	)
+
+	usr, err := handler.UserRepository.GetByUsername(t.Context(), "test")
+	require.NoError(t, err)
+	jwt, err := auth.GenerateJWT(cfg, usr.ID)
+	require.NoError(t, err)
+
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", "Bearer "+jwt)
+	res, err := app.Test(req, -1)
+
+	require.NoError(t, err)
+	require.Equal(t, fiber.StatusOK, res.StatusCode)
+
+	bodyBytes, err := io.ReadAll(res.Body)
+	require.NoError(t, err)
+
+	var body map[string]any
+	err = json.Unmarshal(bodyBytes, &body)
+	require.NoError(t, err)
+}
+
+func TestHandler_GetHandler(t *testing.T) {
+	var app, handler = setup()
+	var cfg = config.NewDefaultConfig()
+	cfg.Auth.Settings["key"] = signingKey
+	app.Use(jwtware.New(jwtware.Config{
+		SigningKey: jwtware.SigningKey{Key: []byte(signingKey), JWTAlg: jwtware.HS256},
+	}))
+	app.Get("/api/user", handler.GetHandler)
+
+	req, _ := http.NewRequest(
+		http.MethodGet,
+		"/api/user",
+		nil,
+	)
+
+	usr, err := handler.UserRepository.GetByUsername(t.Context(), "test")
+	require.NoError(t, err)
+	jwt, err := auth.GenerateJWT(cfg, usr.ID)
+	require.NoError(t, err)
+
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", "Bearer "+jwt)
+	res, err := app.Test(req, -1)
+
+	require.NoError(t, err)
+	require.Equal(t, fiber.StatusOK, res.StatusCode)
+
+	bodyBytes, err := io.ReadAll(res.Body)
+	require.NoError(t, err)
+
+	var body map[string]any
+	err = json.Unmarshal(bodyBytes, &body)
+	require.NoError(t, err)
+	assert.NotEmpty(t, body["user"])
 }

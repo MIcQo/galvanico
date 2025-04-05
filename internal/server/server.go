@@ -107,7 +107,8 @@ func registerUnauthorizedRoutes(app *fiber.App, cfg *config.Config) {
 	prometheus.SetSkipPaths([]string{"/ping", "/readyz", "/livez"})
 	app.Use(prometheus.Middleware)
 
-	var userHandler = user.NewHandler(user.NewUserRepository(database.Connection()), cfg)
+	var userRepo = user.NewUserRepository(database.Connection())
+	var userHandler = user.NewHandler(userRepo, user.NewService(userRepo), cfg)
 
 	var ag = app.Group("/auth")
 	{
@@ -124,13 +125,15 @@ func registerAuthorizedRoutes(app *fiber.App, cfg *config.Config) {
 		SigningKey:   jwtware.SigningKey{Key: key},
 	}))
 
-	var userHandler = user.NewHandler(user.NewUserRepository(database.Connection()), cfg)
+	var userRepo = user.NewUserRepository(database.Connection())
+	var userHandler = user.NewHandler(userRepo, user.NewService(userRepo), cfg)
 
 	var api = app.Group("/api")
 	{
 		var usr = api.Group("/user")
 		{
 			usr.Get("", userHandler.GetHandler)
+			usr.Patch("/username", userHandler.ChangeUsernameHandler)
 		}
 	}
 }

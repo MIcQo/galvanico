@@ -15,6 +15,7 @@ type Repository interface {
 	AddFeature(ctx context.Context, feature *Feature) error
 	RemoveFeature(ctx context.Context, feature *Feature) error
 	UpdateLastLogin(ctx context.Context, user *User, ip string) error
+	ChangeUsername(ctx context.Context, user *User) error
 }
 
 type RepositoryImpl struct {
@@ -80,6 +81,13 @@ func (r *RepositoryImpl) Create(ctx context.Context, user *User) error {
 		return err
 	}
 
+	return nil
+}
+
+func (r *RepositoryImpl) ChangeUsername(ctx context.Context, user *User) error {
+	if _, err := r.db.NewUpdate().Model(user).Column("username").Exec(ctx); err != nil {
+		return err
+	}
 	return nil
 }
 
