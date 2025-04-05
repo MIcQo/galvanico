@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
@@ -10,8 +11,10 @@ import (
 type Repository interface {
 	GetByUsername(ctx context.Context, username string) (*User, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*User, error)
+	Create(ctx context.Context, user *User) error
 	AddFeature(ctx context.Context, feature *Feature) error
 	RemoveFeature(ctx context.Context, feature *Feature) error
+	UpdateLastLogin(ctx context.Context, user *User, ip string) error
 }
 
 type RepositoryImpl struct {
@@ -57,6 +60,26 @@ func (r *RepositoryImpl) RemoveFeature(ctx context.Context, feature *Feature) er
 	if _, err := r.db.NewDelete().Model(feature).Exec(ctx); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (r *RepositoryImpl) UpdateLastLogin(ctx context.Context, user *User, ip string) error {
+	user.LastLoginIP.Valid = true
+	user.LastLoginIP.String = ip
+	user.LastLogin.Valid = true
+	user.LastLogin.Time = time.Now().UTC()
+
+	if _, err := r.db.NewUpdate().Model(user).Column("last_login", "last_login_ip").WherePK().Exec(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RepositoryImpl) Create(ctx context.Context, user *User) error {
+	if _, err := r.db.NewInsert().Model(user).Exec(ctx); err != nil {
+		return err
+	}
+
 	return nil
 }
 

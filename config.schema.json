@@ -86,9 +86,10 @@
           "type": "string",
           "enum": [
             "zitadel",
+            "jwt",
             "other"
           ],
-          "default": "zitadel"
+          "default": "jwt"
         }
       },
       "allOf": [
@@ -120,6 +121,34 @@
                 "required": [
                   "domain",
                   "clientId"
+                ]
+              }
+            },
+            "required": [
+              "settings"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "provider": {
+                "const": "jwt"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "settings": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "key"
                 ]
               }
             },

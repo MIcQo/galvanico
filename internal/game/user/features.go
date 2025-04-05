@@ -8,6 +8,6 @@ import (
 type Feature struct {
 	bun.BaseModel `bun:"table:user_features,alias:uf"`
 
-	UserID  uuid.UUID
+	UserID  uuid.UUID `bun:"type:uuid,pk,default:gen_random_uuid()"`
 	Feature string
 }

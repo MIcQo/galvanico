@@ -1,23 +1,50 @@
 package config
 
 import (
+	"galvanico/internal/utils"
 	"os"
 	"sync"
 
 	"github.com/nats-io/nats.go"
-
 	"github.com/rs/zerolog/log"
-
 	"gopkg.in/yaml.v3"
 )
 
 var FileName = "config.yaml"
+
+const (
+	AuthKeyLength = 32
+)
 
 type Config struct {
 	AppName  string   `yaml:"appName"`
 	LogLevel string   `yaml:"logLevel"`
 	Database Database `yaml:"database"`
 	Broker   Broker   `yaml:"broker"`
+	Auth     *Auth    `yaml:"auth"`
+}
+
+type Auth struct {
+	Provider string            `yaml:"provider"`
+	Settings map[string]string `yaml:"settings"`
+}
+
+func (a *Auth) GetJWTKey() []byte {
+	var key, ok = a.Settings["key"]
+
+	if !ok || key == "" {
+		key = utils.RandomString(AuthKeyLength)
+		a.Settings["key"] = key
+		log.Warn().
+			Str("key", a.Settings["key"]).
+			Msg(
+				"field 'key' in 'auth.settings' was not found or is empty, defaulting to random key, if application " +
+					"would be restarted, then every issued token would be invalid and every user should re-authorize. " +
+					"Please set static key to 'auth.settings.key'",
+			)
+	}
+
+	return []byte(key)
 }
 
 type Database struct {
@@ -40,7 +67,7 @@ func Load() (*Config, error) {
 	return cfg, outputErr
 }
 
-func newDefaultConfig() *Config {
+func NewDefaultConfig() *Config {
 	return &Config{
 		AppName:  "app",
 		LogLevel: "info",
@@ -50,6 +77,12 @@ func newDefaultConfig() *Config {
 		},
 		Broker: Broker{
 			URL: nats.DefaultURL,
+		},
+		Auth: &Auth{
+			Provider: "jwt",
+			Settings: map[string]string{
+				"key": utils.RandomString(AuthKeyLength),
+			},
 		},
 	}
 }
@@ -63,7 +96,7 @@ func loadFile(filename string) (*Config, error) {
 			Bool("exists", false).
 			Msg("using default config, please define your own")
 
-		return newDefaultConfig(), nil
+		return NewDefaultConfig(), nil
 	}
 
 	var file, err = os.ReadFile(filename)
