@@ -4,17 +4,22 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"errors"
 	"galvanico/internal/config"
+	"io"
+	"net/http"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/brianvoe/gofakeit/v7"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
-	"io"
-	"net/http"
-	"testing"
-	"time"
 )
 
 type fakerUserRepository struct {
@@ -42,6 +47,16 @@ func (f *fakerUserRepository) RemoveFeature(_ context.Context, _ *Feature) error
 }
 
 func (f *fakerUserRepository) UpdateLastLogin(_ context.Context, _ *User, _ string) error {
+	return nil
+}
+
+func (f *fakerUserRepository) Create(_ context.Context, usr *User) error {
+	if _, ok := f.data[usr.Username]; ok {
+		return errors.New("username already exists")
+	}
+
+	f.data[usr.Username] = usr
+
 	return nil
 }
 
@@ -83,24 +98,24 @@ func TestHandler_LoginHandler(t *testing.T) {
 	app.Post("/auth/login", handler.LoginHandler)
 
 	noArgsReq, _ := http.NewRequest(
-		"POST",
+		http.MethodPost,
 		"/auth/login",
 		nil,
 	)
 
 	noArgsRes, err := app.Test(noArgsReq, -1)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, fiber.StatusBadRequest, noArgsRes.StatusCode)
 
 	reqBody, err := json.Marshal(authRequest{
 		Username: "test",
 		Password: "test",
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	req, _ := http.NewRequest(
-		"POST",
+		http.MethodPost,
 		"/auth/login",
 		bytes.NewReader(reqBody),
 	)
@@ -108,15 +123,15 @@ func TestHandler_LoginHandler(t *testing.T) {
 
 	res, err := app.Test(req, -1)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, fiber.StatusOK, res.StatusCode)
 
 	bodyBytes, err := io.ReadAll(res.Body)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	var body map[string]any
 	err = json.Unmarshal(bodyBytes, &body)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	assert.NotEmpty(t, body["token"])
 
@@ -126,20 +141,20 @@ func TestHandler_LoginHandler(t *testing.T) {
 		Username: "notfound",
 		Password: "test",
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	notFoundReq, _ := http.NewRequest(
-		"POST",
+		http.MethodPost,
 		"/auth/login",
 		bytes.NewReader(notFoundReqBody),
 	)
 	notFoundReq.Header.Add("Content-Type", "application/json")
 	notFoundRes, err := app.Test(notFoundReq, -1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, fiber.StatusUnauthorized, notFoundRes.StatusCode)
 
 	notFoundBodyBytes, err := io.ReadAll(notFoundRes.Body)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	var notFoundbody = string(notFoundBodyBytes)
 	assert.Equal(t, "invalid credentials", notFoundbody)
@@ -150,27 +165,77 @@ func TestHandler_LoginHandler(t *testing.T) {
 		Username: "banned",
 		Password: "test",
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	bannedReq, _ := http.NewRequest(
-		"POST",
+		http.MethodPost,
 		"/auth/login",
 		bytes.NewReader(bannedReqBody),
 	)
 	bannedReq.Header.Add("Content-Type", "application/json")
 	bannedRes, err := app.Test(bannedReq, -1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, fiber.StatusUnprocessableEntity, bannedRes.StatusCode)
 
 	bannedBodyBytes, err := io.ReadAll(bannedRes.Body)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	var bannedBody map[string]any
 	err = json.Unmarshal(bannedBodyBytes, &bannedBody)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	assert.NotEmpty(t, bannedBody["message"])
 	assert.NotEmpty(t, bannedBody["reason"])
 	assert.Equal(t, "banned", bannedBody["reason"])
 	assert.Equal(t, "user is banned", bannedBody["message"])
+}
+
+func TestHandler_RegisterHandler(t *testing.T) {
+	var app, handler = setup()
+	app.Post("/auth/register", handler.RegisterHandler)
+
+	noArgsReq, _ := http.NewRequest(
+		http.MethodPost,
+		"/auth/register",
+		nil,
+	)
+
+	noArgsRes, err := app.Test(noArgsReq, -1)
+
+	require.NoError(t, err)
+	assert.Equal(t, fiber.StatusBadRequest, noArgsRes.StatusCode)
+
+	// //
+	reqBody, err := json.Marshal(registerRequest{
+		Email:    gofakeit.Email(),
+		Password: gofakeit.Password(true, false, false, false, false, 10),
+	})
+	require.NoError(t, err)
+	req, _ := http.NewRequest(
+		http.MethodPost,
+		"/auth/register",
+		bytes.NewReader(reqBody),
+	)
+	req.Header.Add("Content-Type", "application/json")
+	res, err := app.Test(req, -1)
+
+	require.NoError(t, err)
+	assert.Equal(t, fiber.StatusCreated, res.StatusCode)
+
+	// //
+	validationReq, err := json.Marshal(registerRequest{
+		Email:    gofakeit.Username(),
+		Password: gofakeit.Password(true, false, false, false, false, 10),
+	})
+	require.NoError(t, err)
+	invalidReq, _ := http.NewRequest(
+		http.MethodPost,
+		"/auth/register",
+		bytes.NewReader(validationReq),
+	)
+	invalidReq.Header.Add("Content-Type", "application/json")
+	invalidRes, err := app.Test(invalidReq, -1)
+
+	require.NoError(t, err)
+	assert.Equal(t, fiber.StatusBadRequest, invalidRes.StatusCode)
 }
