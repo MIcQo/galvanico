@@ -25,10 +25,11 @@ var initCmd = &cobra.Command{
 		log.Info().Msg("Migration tables created")
 
 		log.Info().Msg("Running migrations...")
+
 		return createMigrator(cmd.Context(), func(migrator *migrate.Migrator) error {
-			group, err := migrator.Migrate(cmd.Context())
-			if err != nil {
-				return err
+			group, migrateErr := migrator.Migrate(cmd.Context())
+			if migrateErr != nil {
+				return migrateErr
 			}
 			if group.IsZero() {
 				log.Info().Msgf("There are no new migrations to run (database is up to date)")
