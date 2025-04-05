@@ -13,11 +13,12 @@ import (
 )
 
 type Handler struct {
+	Config         *config.Config
 	UserRepository Repository
 }
 
-func NewHandler(userRepository Repository) *Handler {
-	return &Handler{UserRepository: userRepository}
+func NewHandler(userRepository Repository, cfg *config.Config) *Handler {
+	return &Handler{UserRepository: userRepository, Config: cfg}
 }
 
 func (*Handler) GetHandler(c *fiber.Ctx) error {
@@ -38,11 +39,6 @@ type authRequest struct {
 
 // LoginHandler handles login request
 func (h *Handler) LoginHandler(ctx *fiber.Ctx) error {
-	var cfg, cfgErr = config.Load()
-	if cfgErr != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, cfgErr.Error())
-	}
-
 	var req authRequest
 	if err := ctx.BodyParser(&req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
@@ -71,7 +67,7 @@ func (h *Handler) LoginHandler(ctx *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, updateErr.Error())
 	}
 
-	var token, jwtErr = auth.GenerateJWT(cfg, usr.ID)
+	var token, jwtErr = auth.GenerateJWT(h.Config, usr.ID)
 	if jwtErr != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, jwtErr.Error())
 	}
