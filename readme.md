@@ -29,7 +29,7 @@ Galvanico is an open-source, browser-based strategy game inspired by Ikariam, bu
 1.  Clone the repository:
 
     ```bash
-    git clone [https://github.com/yourusername/galvanico.git](https://www.google.com/search?q=https://github.com/yourusername/galvanico.git)
+    git clone https://github.com/MIcQo/galvanico.git
     cd galvanico
     ```
 
@@ -38,19 +38,41 @@ Galvanico is an open-source, browser-based strategy game inspired by Ikariam, bu
     ```bash
     go mod tidy
     ```
+3. Stand up required services:
 
-3.  Install frontend dependencies (Vue 3):
+    ```bash
+    docker compose up -d
+    ```
+
+4. Configure environment variables:
+
+    ```bash
+    cp config.yaml.example config.yaml
+    ```
+
+    Edit `config.yaml` with your desired settings.
+
+
+5. Initialize the database:
+
+    First, you need to create the inital bun migration schema:
+
+    ```bash
+    go run main.go db init
+    ```
+
+5.  Start the backend server:
+
+    ```bash
+    go run main.go serve
+    ```
+
+4.  Install frontend dependencies (Vue 3):
 
     ```bash
     cd client
     npm install # or yarn install
     cd ..
-    ```
-
-4.  Start the backend server:
-
-    ```bash
-    go run server/main.go
     ```
 
 5.  Start the frontend development server:
@@ -70,15 +92,14 @@ We welcome contributions from the community! Please read our [CONTRIBUTING.md](C
 
 ```
 galvanico/
-├── cmd/             # Go commands
-├── client/          # Frontend code (Vue 3, etc.)
-├── server/          # Backend code (Go)
-├── internal/        # Internal code between server parts (if any)
-├── docs/            # Documentation
-├── migrations/      # Migration files
-├── CONTRIBUTING.md  # Contribution guidelines
-├── LICENSE          # License information
-└── README.md        # This file
+├── cmd/                # Go commands
+├── client/             # Frontend code (Vue 3, etc.)
+├── internal/           # Internal code between server parts (if any)
+├── migrations/         # Migration files
+├── docker-compose.yaml # Docker compose file
+├── CONTRIBUTING.md     # Contribution guidelines
+├── LICENSE             # License information
+└── README.md           # This file
 ```
 
 ### Technologies Used
