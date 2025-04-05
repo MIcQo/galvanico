@@ -6,10 +6,12 @@ import (
 	"galvanico/internal/auth"
 	"galvanico/internal/config"
 	"galvanico/internal/database"
+	"time"
+
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"time"
 )
 
 type Handler struct {
@@ -37,6 +39,11 @@ type authRequest struct {
 	Password string `json:"password"`
 }
 
+type registerRequest struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
+
 // LoginHandler handles login request
 func (h *Handler) LoginHandler(ctx *fiber.Ctx) error {
 	var req authRequest
@@ -59,7 +66,8 @@ func (h *Handler) LoginHandler(ctx *fiber.Ctx) error {
 	}
 
 	if usr.BanExpiration.Valid && usr.BanExpiration.Time.After(time.Now().UTC()) {
-		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{"message": "user is banned", "reason": usr.BanReason.String})
+		return ctx.Status(fiber.StatusUnprocessableEntity).
+			JSON(fiber.Map{"message": "user is banned", "reason": usr.BanReason.String})
 	}
 
 	var updateErr = h.UserRepository.UpdateLastLogin(ctx.Context(), usr, ctx.IP())
@@ -77,8 +85,40 @@ func (h *Handler) LoginHandler(ctx *fiber.Ctx) error {
 	})
 }
 
-func (h *Handler) RegisterHandler(_ *fiber.Ctx) error {
-	return nil
+func (h *Handler) RegisterHandler(ctx *fiber.Ctx) error {
+	var req registerRequest
+	if err := ctx.BodyParser(&req); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	var validate = validator.New()
+	if err := validate.Struct(req); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	var username, genErr = UsernameGenerator()
+	if genErr != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, genErr.Error())
+	}
+
+	var usr = &User{
+		ID:        uuid.New(),
+		Email:     req.Email,
+		Password:  sql.NullString{String: req.Password, Valid: true},
+		Username:  username,
+		Status:    "pending",
+		Language:  "en",
+		CreatedAt: time.Now().UTC(),
+		Resources: Resources{
+			Gold: DefaultUserGold,
+		},
+	}
+
+	if err := h.UserRepository.Create(ctx.Context(), usr); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{})
 }
 
 func GetUser(c *fiber.Ctx) (*User, error) {

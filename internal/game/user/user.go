@@ -8,6 +8,10 @@ import (
 	"github.com/uptrace/bun"
 )
 
+const (
+	DefaultUserGold = 1000
+)
+
 type User struct {
 	bun.BaseModel `bun:"table:users,alias:u"`
 
@@ -15,6 +19,7 @@ type User struct {
 	ExternalID    sql.NullInt64
 	Status        string
 	Username      string
+	Email         string
 	Password      sql.NullString `json:"-"`
 	LastLogin     sql.NullTime
 	LastLoginIP   sql.NullString
