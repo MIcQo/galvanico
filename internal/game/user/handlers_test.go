@@ -12,15 +12,14 @@ import (
 	"testing"
 	"time"
 
-	jwtware "github.com/gofiber/contrib/jwt"
-
-	"github.com/stretchr/testify/require"
-
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/goccy/go-json"
+	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -77,6 +76,43 @@ func (f *fakerUserRepository) ChangePassword(_ context.Context, _ *User) error {
 	return nil
 }
 
+type fakeService struct {
+	repo Repository
+}
+
+// GetUser this faked function mirrors real-one, cause of jwt
+//
+// Consider: Probably we can you other "verification" in the future
+func (f fakeService) GetUser(c *fiber.Ctx) (*User, error) {
+	var user, userOk = c.Locals("user").(*jwt.Token)
+	if !userOk {
+		return nil, errors.New("user not authenticated")
+	}
+
+	var claims, claimOk = user.Claims.(jwt.MapClaims)
+	if !claimOk {
+		return nil, errors.New("invalid user claims")
+	}
+
+	var sub, ok = claims["sub"].(string)
+	if !ok {
+		return nil, errors.New("invalid user sub")
+	}
+
+	var uid = uuid.MustParse(sub)
+	var usr, err = f.repo.GetByID(c.Context(), uid)
+	if err != nil {
+		return nil, err
+	}
+
+	return usr, nil
+}
+
+// SendActivationEmail is not what we want in testing mode
+func (f fakeService) SendActivationEmail(_ *User) error {
+	return nil
+}
+
 func setup() (*fiber.App, *Handler) {
 	var pass, err = bcrypt.GenerateFromPassword([]byte("test"), bcrypt.DefaultCost)
 	if err != nil {
@@ -103,7 +139,7 @@ func setup() (*fiber.App, *Handler) {
 			BanReason:     sql.NullString{Valid: true, String: "banned"},
 		},
 	}}
-	var svc = NewService(repo)
+	var svc = &fakeService{repo: repo}
 	var app = fiber.New()
 	var handler = NewHandler(repo, svc, cfg)
 
@@ -278,11 +314,11 @@ func TestHandler_ChangeUsernameHandler(t *testing.T) {
 
 	usr, err := handler.UserRepository.GetByUsername(t.Context(), "test")
 	require.NoError(t, err)
-	jwt, err := auth.GenerateJWT(cfg, usr.ID)
+	token, err := auth.GenerateJWT(cfg, usr.ID)
 	require.NoError(t, err)
 
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer "+jwt)
+	req.Header.Add("Authorization", "Bearer "+token)
 	res, err := app.Test(req, -1)
 
 	require.NoError(t, err)
@@ -313,11 +349,11 @@ func TestHandler_GetHandler(t *testing.T) {
 
 	usr, err := handler.UserRepository.GetByUsername(t.Context(), "test")
 	require.NoError(t, err)
-	jwt, err := auth.GenerateJWT(cfg, usr.ID)
+	token, err := auth.GenerateJWT(cfg, usr.ID)
 	require.NoError(t, err)
 
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer "+jwt)
+	req.Header.Add("Authorization", "Bearer "+token)
 	res, err := app.Test(req, -1)
 
 	require.NoError(t, err)
@@ -355,11 +391,11 @@ func TestHandler_ChangePasswordHandler(t *testing.T) {
 
 	usr, err := handler.UserRepository.GetByUsername(t.Context(), "test")
 	require.NoError(t, err)
-	jwt, err := auth.GenerateJWT(cfg, usr.ID)
+	token, err := auth.GenerateJWT(cfg, usr.ID)
 	require.NoError(t, err)
 
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer "+jwt)
+	req.Header.Add("Authorization", "Bearer "+token)
 	res, err := app.Test(req, -1)
 
 	require.NoError(t, err)

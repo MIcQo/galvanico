@@ -4,8 +4,11 @@ import (
 	"database/sql"
 	"errors"
 	"galvanico/internal/auth"
+	"galvanico/internal/broker"
 	"galvanico/internal/config"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -18,10 +21,10 @@ import (
 type Handler struct {
 	Config         *config.Config
 	UserRepository Repository
-	Service        *Service
+	Service        Service
 }
 
-func NewHandler(userRepository Repository, service *Service, cfg *config.Config) *Handler {
+func NewHandler(userRepository Repository, service Service, cfg *config.Config) *Handler {
 	return &Handler{UserRepository: userRepository, Service: service, Config: cfg}
 }
 
@@ -120,6 +123,10 @@ func (h *Handler) RegisterHandler(ctx *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
+	if err := h.Service.SendActivationEmail(usr); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
 	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{})
 }
 
@@ -190,15 +197,20 @@ func (h *Handler) ChangePasswordHandler(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "changed password successfully"})
 }
 
-type Service struct {
+type Service interface {
+	GetUser(c *fiber.Ctx) (*User, error)
+	SendActivationEmail(u *User) error
+}
+
+type ServiceIml struct {
 	UserRepository Repository
 }
 
-func NewService(userRepository Repository) *Service {
-	return &Service{UserRepository: userRepository}
+func NewService(userRepository Repository) Service {
+	return &ServiceIml{UserRepository: userRepository}
 }
 
-func (s *Service) GetUser(c *fiber.Ctx) (*User, error) {
+func (s *ServiceIml) GetUser(c *fiber.Ctx) (*User, error) {
 	var user, userOk = c.Locals("user").(*jwt.Token)
 	if !userOk {
 		return nil, errors.New("user not authenticated")
@@ -221,4 +233,17 @@ func (s *Service) GetUser(c *fiber.Ctx) (*User, error) {
 	}
 
 	return usr, nil
+}
+
+func (s *ServiceIml) SendActivationEmail(usr *User) error {
+	var u, err = json.Marshal(usr)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	if pubErr := broker.Connection().Publish("channels.email", u); pubErr != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, pubErr.Error())
+	}
+
+	return nil
 }
