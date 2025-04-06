@@ -22,6 +22,7 @@ require (
 	github.com/uptrace/bun/extra/bundebug v1.2.11
 	github.com/uptrace/bun/extra/bunotel v1.2.11
 	golang.org/x/crypto v0.36.0
+	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394
 	golang.org/x/text v0.23.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -59,7 +60,6 @@ require (
 	github.com/puzpuzpuz/xsync/v3 v3.5.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
-	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
 	github.com/uptrace/opentelemetry-go-extra/otelsql v0.3.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect

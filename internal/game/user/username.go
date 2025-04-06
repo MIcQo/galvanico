@@ -1,8 +1,7 @@
 package user
 
 import (
-	"crypto/rand"
-	"math/big"
+	"galvanico/internal/utils"
 	"strconv"
 	"strings"
 
@@ -63,7 +62,7 @@ func UsernameGenerator() (string, error) {
 		b.WriteString("_")
 	}
 
-	var randomNumber, err = randomInt(minNumber, maxNumber)
+	var randomNumber, err = utils.RandomNumber(minNumber, maxNumber)
 	if err != nil {
 		return "", err
 	}
@@ -83,33 +82,8 @@ func UsernameGenerator() (string, error) {
 
 func randomWord(i int) (string, error) {
 	if i == 0 {
-		return randomFirstWord()
+		return utils.RandomIndex(firstWords)
 	}
 
-	return randomSecondWord()
-}
-
-func randomInt(minN, maxN int64) (int64, error) {
-	bg := big.NewInt(maxN - minN)
-	n, err := rand.Int(rand.Reader, bg)
-	if err != nil {
-		return 0, err
-	}
-
-	return n.Int64() + minN, nil
-}
-
-func randomFirstWord() (string, error) {
-	var firstWord, err = rand.Int(rand.Reader, big.NewInt(int64(len(firstWords))))
-	if err != nil {
-		return "", err
-	}
-	return firstWords[firstWord.Int64()], nil
-}
-func randomSecondWord() (string, error) {
-	var secondWord, err = rand.Int(rand.Reader, big.NewInt(int64(len(secondWords))))
-	if err != nil {
-		return "", err
-	}
-	return secondWords[secondWord.Int64()], nil
+	return utils.RandomIndex(secondWords)
 }
