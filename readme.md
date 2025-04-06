@@ -47,7 +47,7 @@ Galvanico is an open-source, browser-based strategy game inspired by Ikariam, bu
 4. Configure environment variables:
 
     ```bash
-    cp config.yaml.example config.yaml
+    cp config.example.yaml config.yaml
     ```
 
     Edit `config.yaml` with your desired settings.
@@ -96,6 +96,7 @@ galvanico/
 ├── client/             # Frontend code (Vue 3, etc.)
 ├── internal/           # Internal code between server parts (if any)
 ├── migrations/         # Migration files
+├── docs/               # Documentation
 ├── docker-compose.yaml # Docker compose file
 ├── CONTRIBUTING.md     # Contribution guidelines
 ├── LICENSE             # License information
