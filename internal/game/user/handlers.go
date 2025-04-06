@@ -4,17 +4,14 @@ import (
 	"database/sql"
 	"errors"
 	"galvanico/internal/auth"
-	"galvanico/internal/broker"
 	"galvanico/internal/config"
+	"galvanico/internal/notifications"
 	"time"
-
-	"github.com/goccy/go-json"
 
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -123,7 +120,7 @@ func (h *Handler) RegisterHandler(ctx *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	if err := h.Service.SendActivationEmail(usr); err != nil {
+	if err := h.Service.SendActivationEmail(notifications.NewActivationEmail(usr.Email, usr.Username)); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
@@ -194,56 +191,9 @@ func (h *Handler) ChangePasswordHandler(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(fiber.Map{"message": "changed password successfully"})
-}
-
-type Service interface {
-	GetUser(c *fiber.Ctx) (*User, error)
-	SendActivationEmail(u *User) error
-}
-
-type ServiceIml struct {
-	UserRepository Repository
-}
-
-func NewService(userRepository Repository) Service {
-	return &ServiceIml{UserRepository: userRepository}
-}
-
-func (s *ServiceIml) GetUser(c *fiber.Ctx) (*User, error) {
-	var user, userOk = c.Locals("user").(*jwt.Token)
-	if !userOk {
-		return nil, errors.New("user not authenticated")
-	}
-
-	var claims, claimOk = user.Claims.(jwt.MapClaims)
-	if !claimOk {
-		return nil, errors.New("invalid user claims")
-	}
-
-	var sub, ok = claims["sub"].(string)
-	if !ok {
-		return nil, errors.New("invalid user sub")
-	}
-
-	var uid = uuid.MustParse(sub)
-	var usr, err = s.UserRepository.GetByID(c.Context(), uid)
-	if err != nil {
-		return nil, err
-	}
-
-	return usr, nil
-}
-
-func (s *ServiceIml) SendActivationEmail(usr *User) error {
-	var u, err = json.Marshal(usr)
-	if err != nil {
+	if err := h.Service.SendPasswordWasChangedEmail(notifications.NewPasswordWasChanged(usr.Email, usr.Username)); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	if pubErr := broker.Connection().Publish("channels.email", u); pubErr != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, pubErr.Error())
-	}
-
-	return nil
+	return c.JSON(fiber.Map{"message": "changed password successfully"})
 }

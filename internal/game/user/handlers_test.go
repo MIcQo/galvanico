@@ -7,6 +7,7 @@ import (
 	"errors"
 	"galvanico/internal/auth"
 	"galvanico/internal/config"
+	"galvanico/internal/notifications"
 	"io"
 	"net/http"
 	"testing"
@@ -109,7 +110,12 @@ func (f fakeService) GetUser(c *fiber.Ctx) (*User, error) {
 }
 
 // SendActivationEmail is not what we want in testing mode
-func (f fakeService) SendActivationEmail(_ *User) error {
+func (f fakeService) SendActivationEmail(_ *notifications.ActivationEmail) error {
+	return nil
+}
+
+// SendPasswordWasChangedEmail is not what we want in testing mode
+func (f fakeService) SendPasswordWasChangedEmail(_ *notifications.PasswordWasChanged) error {
 	return nil
 }
 
