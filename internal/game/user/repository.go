@@ -28,7 +28,7 @@ func (r *RepositoryImpl) GetByUsername(ctx context.Context, username string) (*U
 	var query = r.db.NewSelect().Model(&user).
 		Relation("Features").
 		Relation("Resources").
-		Where("username = ?", username)
+		Where("username = ? OR email = ?", username, username)
 
 	if err := query.Scan(ctx); err != nil {
 		return nil, err
