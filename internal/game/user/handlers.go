@@ -112,10 +112,15 @@ func (h *Handler) RegisterHandler(ctx *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, genErr.Error())
 	}
 
+	var pass, cryptErr = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if cryptErr != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, cryptErr.Error())
+	}
+
 	var usr = &User{
 		ID:        uuid.New(),
 		Email:     req.Email,
-		Password:  sql.NullString{String: req.Password, Valid: true},
+		Password:  sql.NullString{String: string(pass), Valid: true},
 		Username:  username,
 		Status:    "pending",
 		Language:  "en",
