@@ -25,10 +25,11 @@ func RandomString(n int) string {
 }
 
 // RandomIndex returns value of random index
-func RandomIndex[E cmp.Ordered](slice []E) (val E, err error) {
+func RandomIndex[E cmp.Ordered](slice []E) (E, error) {
 	randIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(slice))))
 	if err != nil {
-		return
+		var t E
+		return t, err
 	}
 	return slice[randIndex.Int64()], nil
 }

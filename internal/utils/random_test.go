@@ -27,6 +27,6 @@ func TestRandomNumber(t *testing.T) {
 
 func TestRandomString(t *testing.T) {
 	var str = RandomString(10)
-	require.NotEqual(t, str, "")
+	require.NotEmpty(t, str)
 	require.Len(t, str, 10)
 }

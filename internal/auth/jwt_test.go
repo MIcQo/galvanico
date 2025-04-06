@@ -12,8 +12,8 @@ func TestGenerateJWT(t *testing.T) {
 	var cfg = config.NewDefaultConfig()
 	cfg.Auth.Settings["key"] = "token"
 
-	var fixedUuid = uuid.MustParse("ebfc76b7-7ace-4034-a8b6-cc369afa8fb8")
-	var token, err = GenerateJWT(cfg, fixedUuid)
+	var fixedUUID = uuid.MustParse("ebfc76b7-7ace-4034-a8b6-cc369afa8fb8")
+	var token, err = GenerateJWT(cfg, fixedUUID)
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
 }
