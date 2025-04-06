@@ -15,6 +15,25 @@ import (
 	"github.com/google/uuid"
 )
 
+type authRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type registerRequest struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
+
+type usernameRequest struct {
+	Username string `json:"username"`
+}
+
+type changePasswordRequest struct {
+	Password    string `json:"password" validate:"required"`
+	NewPassword string `json:"newPassword" validate:"required"`
+}
+
 type Handler struct {
 	Config         *config.Config
 	UserRepository Repository
@@ -34,16 +53,6 @@ func (h *Handler) GetHandler(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"user": usr,
 	})
-}
-
-type authRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type registerRequest struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
 }
 
 // LoginHandler handles login request
@@ -127,10 +136,6 @@ func (h *Handler) RegisterHandler(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{})
 }
 
-type usernameRequest struct {
-	Username string `json:"username"`
-}
-
 func (h *Handler) ChangeUsernameHandler(c *fiber.Ctx) error {
 	var usr, usrErr = h.Service.GetUser(c)
 	if usrErr != nil {
@@ -153,11 +158,6 @@ func (h *Handler) ChangeUsernameHandler(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{"username": req.Username})
-}
-
-type changePasswordRequest struct {
-	Password    string `json:"password" validate:"required"`
-	NewPassword string `json:"newPassword" validate:"required"`
 }
 
 func (h *Handler) ChangePasswordHandler(c *fiber.Ctx) error {
