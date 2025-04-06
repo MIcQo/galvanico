@@ -4,6 +4,7 @@ import (
 	"errors"
 	"galvanico/internal/broker"
 	"galvanico/internal/notifications"
+
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"

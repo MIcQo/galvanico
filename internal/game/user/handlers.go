@@ -191,7 +191,8 @@ func (h *Handler) ChangePasswordHandler(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	if err := h.Service.SendPasswordWasChangedEmail(notifications.NewPasswordWasChanged(usr.Email, usr.Username)); err != nil {
+	var mail = notifications.NewPasswordWasChanged(usr.Email, usr.Username)
+	if err := h.Service.SendPasswordWasChangedEmail(mail); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
