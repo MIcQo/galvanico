@@ -134,6 +134,7 @@ func registerAuthorizedRoutes(app *fiber.App, cfg *config.Config) {
 		{
 			usr.Get("", userHandler.GetHandler)
 			usr.Patch("/username", userHandler.ChangeUsernameHandler)
+			usr.Patch("/password", userHandler.ChangePasswordHandler)
 		}
 	}
 }
