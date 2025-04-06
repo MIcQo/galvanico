@@ -76,7 +76,7 @@ func UsernameGenerator() (string, error) {
 		wrdBld.WriteString(caser.String(word))
 	}
 
-	wrdBld.WriteString(strconv.FormatInt(randomNumber, 32))
+	wrdBld.WriteString(strconv.FormatInt(randomNumber, 10))
 
 	return wrdBld.String(), nil
 }
