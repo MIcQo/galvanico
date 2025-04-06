@@ -7,6 +7,8 @@ import (
 	"galvanico/internal/config"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -147,6 +149,45 @@ func (h *Handler) ChangeUsernameHandler(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{"username": req.Username})
+}
+
+type changePasswordRequest struct {
+	Password    string `json:"password" validate:"required"`
+	NewPassword string `json:"newPassword" validate:"required"`
+}
+
+func (h *Handler) ChangePasswordHandler(c *fiber.Ctx) error {
+	var usr, usrErr = h.Service.GetUser(c)
+	if usrErr != nil {
+		return fiber.NewError(fiber.StatusForbidden, usrErr.Error())
+	}
+
+	var req changePasswordRequest
+	if err := c.BodyParser(&req); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	var validate = validator.New()
+	if err := validate.Struct(req); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	if req.NewPassword == req.Password {
+		return fiber.NewError(fiber.StatusBadRequest, "new password is same as old password")
+	}
+
+	var newPassword, cryptErr = bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if cryptErr != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, cryptErr.Error())
+	}
+
+	usr.Password = sql.NullString{String: string(newPassword), Valid: true}
+
+	if err := h.UserRepository.ChangePassword(c.Context(), usr); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(fiber.Map{"message": "changed password successfully"})
 }
 
 type Service struct {

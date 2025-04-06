@@ -73,6 +73,10 @@ func (f *fakerUserRepository) Create(_ context.Context, usr *User) error {
 	return nil
 }
 
+func (f *fakerUserRepository) ChangePassword(_ context.Context, _ *User) error {
+	return nil
+}
+
 func setup() (*fiber.App, *Handler) {
 	var pass, err = bcrypt.GenerateFromPassword([]byte("test"), bcrypt.DefaultCost)
 	if err != nil {
@@ -326,4 +330,45 @@ func TestHandler_GetHandler(t *testing.T) {
 	err = json.Unmarshal(bodyBytes, &body)
 	require.NoError(t, err)
 	assert.NotEmpty(t, body["user"])
+}
+
+func TestHandler_ChangePasswordHandler(t *testing.T) {
+	var app, handler = setup()
+	var cfg = config.NewDefaultConfig()
+	cfg.Auth.Settings["key"] = signingKey
+	app.Use(jwtware.New(jwtware.Config{
+		SigningKey: jwtware.SigningKey{Key: []byte(signingKey), JWTAlg: jwtware.HS256},
+	}))
+	app.Patch("/api/user/password", handler.ChangePasswordHandler)
+
+	var reqBody, err = json.Marshal(changePasswordRequest{
+		Password:    "test",
+		NewPassword: gofakeit.Password(true, false, false, false, false, 10)},
+	)
+	require.NoError(t, err)
+
+	req, _ := http.NewRequest(
+		http.MethodPatch,
+		"/api/user/password",
+		bytes.NewReader(reqBody),
+	)
+
+	usr, err := handler.UserRepository.GetByUsername(t.Context(), "test")
+	require.NoError(t, err)
+	jwt, err := auth.GenerateJWT(cfg, usr.ID)
+	require.NoError(t, err)
+
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", "Bearer "+jwt)
+	res, err := app.Test(req, -1)
+
+	require.NoError(t, err)
+	require.Equal(t, fiber.StatusOK, res.StatusCode)
+
+	bodyBytes, err := io.ReadAll(res.Body)
+	require.NoError(t, err)
+
+	var body map[string]any
+	err = json.Unmarshal(bodyBytes, &body)
+	require.NoError(t, err)
 }
