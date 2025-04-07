@@ -26,11 +26,10 @@ jobs:
         run: |
           export GOPATH="$HOME/go/"
           export PATH=$PATH:$GOPATH/bin
-          go test -v ./...
-        # go install github.com/jstemmer/go-junit-report@latest
-        # | go-junit-report -set-exit-code > report.xml
+          go install github.com/jstemmer/go-junit-report@latest
+          go test -v ./... | go-junit-report -set-exit-code > report.xml
 
-#      - name: Test Summary
-#        uses: test-summary/action@31493c76ec9e7aa675f1585d3ed6f1da69269a86 # v2
-#        with:
-#          paths: report.xml
+      - name: Test Summary
+        uses: test-summary/action@31493c76ec9e7aa675f1585d3ed6f1da69269a86 # v2
+        with:
+          paths: report.xml
