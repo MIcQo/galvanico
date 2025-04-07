@@ -8,6 +8,8 @@ import (
 	"galvanico/internal/notifications"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/go-playground/validator/v10"
@@ -45,7 +47,11 @@ func NewHandler(userRepository Repository, service Service, cfg *config.Config) 
 }
 
 func (h *Handler) GetHandler(c *fiber.Ctx) error {
-	var usr, err = h.Service.GetUser(c)
+	var token, ok = c.Locals("user").(*jwt.Token)
+	if !ok {
+		return fiber.ErrUnauthorized
+	}
+	var usr, err = h.Service.GetUser(c.Context(), token)
 	if err != nil {
 		return fiber.NewError(fiber.StatusForbidden, err.Error())
 	}
@@ -64,7 +70,6 @@ func (h *Handler) LoginHandler(ctx *fiber.Ctx) error {
 
 	var usr, err = h.UserRepository.GetByUsername(ctx.Context(), req.Username)
 	if err != nil {
-		// if errors.Is(err, pgx.ErrNoRows) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return fiber.NewError(fiber.StatusUnauthorized, "invalid credentials")
 		}
@@ -107,21 +112,10 @@ func (h *Handler) RegisterHandler(ctx *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	var username, genErr = UsernameGenerator()
-	if genErr != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, genErr.Error())
-	}
-
-	var pass, cryptErr = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if cryptErr != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, cryptErr.Error())
-	}
-
 	var usr = &User{
 		ID:        uuid.New(),
 		Email:     req.Email,
-		Password:  sql.NullString{String: string(pass), Valid: true},
-		Username:  username,
+		Password:  sql.NullString{String: req.Password, Valid: true},
 		Status:    "pending",
 		Language:  "en",
 		CreatedAt: time.Now().UTC(),
@@ -130,11 +124,7 @@ func (h *Handler) RegisterHandler(ctx *fiber.Ctx) error {
 		},
 	}
 
-	if err := h.UserRepository.Create(ctx.Context(), usr); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
-	}
-
-	if err := h.Service.SendActivationEmail(notifications.NewActivationEmail(usr.Email, usr.Username)); err != nil {
+	if err := h.Service.Register(ctx.Context(), usr); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
@@ -142,7 +132,11 @@ func (h *Handler) RegisterHandler(ctx *fiber.Ctx) error {
 }
 
 func (h *Handler) ChangeUsernameHandler(c *fiber.Ctx) error {
-	var usr, usrErr = h.Service.GetUser(c)
+	var token, ok = c.Locals("user").(*jwt.Token)
+	if !ok {
+		return fiber.ErrUnauthorized
+	}
+	var usr, usrErr = h.Service.GetUser(c.Context(), token)
 	if usrErr != nil {
 		return fiber.NewError(fiber.StatusForbidden, usrErr.Error())
 	}
@@ -166,7 +160,11 @@ func (h *Handler) ChangeUsernameHandler(c *fiber.Ctx) error {
 }
 
 func (h *Handler) ChangePasswordHandler(c *fiber.Ctx) error {
-	var usr, usrErr = h.Service.GetUser(c)
+	var token, ok = c.Locals("user").(*jwt.Token)
+	if !ok {
+		return fiber.ErrUnauthorized
+	}
+	var usr, usrErr = h.Service.GetUser(c.Context(), token)
 	if usrErr != nil {
 		return fiber.NewError(fiber.StatusForbidden, usrErr.Error())
 	}

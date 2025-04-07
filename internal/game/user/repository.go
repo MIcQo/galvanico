@@ -2,11 +2,15 @@ package user
 
 import (
 	"context"
+	"errors"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
+
+var ErrDuplicateEntry = errors.New("duplicate entry")
 
 type Repository interface {
 	GetByUsername(ctx context.Context, username string) (*User, error)
@@ -79,6 +83,9 @@ func (r *RepositoryImpl) UpdateLastLogin(ctx context.Context, user *User, ip str
 
 func (r *RepositoryImpl) Create(ctx context.Context, user *User) error {
 	if _, err := r.db.NewInsert().Model(user).Exec(ctx); err != nil {
+		if strings.Contains(err.Error(), "duplicate") {
+			return ErrDuplicateEntry
+		}
 		return err
 	}
 

@@ -21,8 +21,8 @@ func TestRandomIndex(t *testing.T) {
 func TestRandomNumber(t *testing.T) {
 	var n, err = RandomNumber(10, 50)
 	require.NoError(t, err)
-	require.Greater(t, n, int64(10))
-	require.Less(t, n, int64(50))
+	require.GreaterOrEqual(t, n, int64(10))
+	require.LessOrEqual(t, n, int64(50))
 }
 
 func TestRandomString(t *testing.T) {

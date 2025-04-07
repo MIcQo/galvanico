@@ -84,13 +84,8 @@ type fakeService struct {
 // GetUser this faked function mirrors real-one, cause of jwt
 //
 // Consider: Probably we can you other "verification" in the future
-func (f fakeService) GetUser(c *fiber.Ctx) (*User, error) {
-	var user, userOk = c.Locals("user").(*jwt.Token)
-	if !userOk {
-		return nil, errors.New("user not authenticated")
-	}
-
-	var claims, claimOk = user.Claims.(jwt.MapClaims)
+func (f *fakeService) GetUser(ctx context.Context, token *jwt.Token) (*User, error) {
+	var claims, claimOk = token.Claims.(jwt.MapClaims)
 	if !claimOk {
 		return nil, errors.New("invalid user claims")
 	}
@@ -101,7 +96,7 @@ func (f fakeService) GetUser(c *fiber.Ctx) (*User, error) {
 	}
 
 	var uid = uuid.MustParse(sub)
-	var usr, err = f.repo.GetByID(c.Context(), uid)
+	var usr, err = f.repo.GetByID(ctx, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -110,12 +105,16 @@ func (f fakeService) GetUser(c *fiber.Ctx) (*User, error) {
 }
 
 // SendActivationEmail is not what we want in testing mode
-func (f fakeService) SendActivationEmail(_ *notifications.ActivationEmail) error {
+func (f *fakeService) SendActivationEmail(_ *notifications.ActivationEmail) error {
 	return nil
 }
 
 // SendPasswordWasChangedEmail is not what we want in testing mode
-func (f fakeService) SendPasswordWasChangedEmail(_ *notifications.PasswordWasChanged) error {
+func (f *fakeService) SendPasswordWasChangedEmail(_ *notifications.PasswordWasChanged) error {
+	return nil
+}
+
+func (f *fakeService) Register(_ context.Context, _ *User) error {
 	return nil
 }
 
@@ -157,147 +156,155 @@ func TestHandler_LoginHandler(t *testing.T) {
 
 	app.Post("/auth/login", handler.LoginHandler)
 
-	noArgsReq, _ := http.NewRequest(
-		http.MethodPost,
-		"/auth/login",
-		nil,
-	)
+	t.Run("login with no args", func(t *testing.T) {
+		noArgsReq, _ := http.NewRequest(
+			http.MethodPost,
+			"/auth/login",
+			nil,
+		)
 
-	noArgsRes, err := app.Test(noArgsReq, -1)
+		noArgsRes, err := app.Test(noArgsReq, -1)
 
-	require.NoError(t, err)
-	assert.Equal(t, fiber.StatusBadRequest, noArgsRes.StatusCode)
-
-	reqBody, err := json.Marshal(authRequest{
-		Username: "test",
-		Password: "test",
+		require.NoError(t, err)
+		assert.Equal(t, fiber.StatusBadRequest, noArgsRes.StatusCode)
 	})
-	require.NoError(t, err)
 
-	req, _ := http.NewRequest(
-		http.MethodPost,
-		"/auth/login",
-		bytes.NewReader(reqBody),
-	)
-	req.Header.Add("Content-Type", "application/json")
+	t.Run("success login", func(t *testing.T) {
+		reqBody, err := json.Marshal(authRequest{
+			Username: "test",
+			Password: "test",
+		})
+		require.NoError(t, err)
 
-	res, err := app.Test(req, -1)
+		req, _ := http.NewRequest(
+			http.MethodPost,
+			"/auth/login",
+			bytes.NewReader(reqBody),
+		)
+		req.Header.Add("Content-Type", "application/json")
 
-	require.NoError(t, err)
-	assert.Equal(t, fiber.StatusOK, res.StatusCode)
+		res, err := app.Test(req, -1)
 
-	bodyBytes, err := io.ReadAll(res.Body)
-	require.NoError(t, err)
+		require.NoError(t, err)
+		assert.Equal(t, fiber.StatusOK, res.StatusCode)
 
-	var body map[string]any
-	err = json.Unmarshal(bodyBytes, &body)
-	require.NoError(t, err)
+		bodyBytes, err := io.ReadAll(res.Body)
+		require.NoError(t, err)
 
-	assert.NotEmpty(t, body["token"])
+		var body map[string]any
+		err = json.Unmarshal(bodyBytes, &body)
+		require.NoError(t, err)
 
-	// //
-
-	notFoundReqBody, err := json.Marshal(authRequest{
-		Username: "notfound",
-		Password: "test",
+		assert.NotEmpty(t, body["token"])
 	})
-	require.NoError(t, err)
 
-	notFoundReq, _ := http.NewRequest(
-		http.MethodPost,
-		"/auth/login",
-		bytes.NewReader(notFoundReqBody),
-	)
-	notFoundReq.Header.Add("Content-Type", "application/json")
-	notFoundRes, err := app.Test(notFoundReq, -1)
-	require.NoError(t, err)
-	assert.Equal(t, fiber.StatusUnauthorized, notFoundRes.StatusCode)
+	t.Run("invalid credentials", func(t *testing.T) {
+		notFoundReqBody, err := json.Marshal(authRequest{
+			Username: "notfound",
+			Password: "test",
+		})
+		require.NoError(t, err)
 
-	notFoundBodyBytes, err := io.ReadAll(notFoundRes.Body)
-	require.NoError(t, err)
+		notFoundReq, _ := http.NewRequest(
+			http.MethodPost,
+			"/auth/login",
+			bytes.NewReader(notFoundReqBody),
+		)
+		notFoundReq.Header.Add("Content-Type", "application/json")
+		notFoundRes, err := app.Test(notFoundReq, -1)
+		require.NoError(t, err)
+		assert.Equal(t, fiber.StatusUnauthorized, notFoundRes.StatusCode)
 
-	var notFoundbody = string(notFoundBodyBytes)
-	assert.Equal(t, "invalid credentials", notFoundbody)
+		notFoundBodyBytes, err := io.ReadAll(notFoundRes.Body)
+		require.NoError(t, err)
 
-	// //
-
-	bannedReqBody, err := json.Marshal(authRequest{
-		Username: "banned",
-		Password: "test",
+		var notFoundbody = string(notFoundBodyBytes)
+		assert.Equal(t, "invalid credentials", notFoundbody)
 	})
-	require.NoError(t, err)
 
-	bannedReq, _ := http.NewRequest(
-		http.MethodPost,
-		"/auth/login",
-		bytes.NewReader(bannedReqBody),
-	)
-	bannedReq.Header.Add("Content-Type", "application/json")
-	bannedRes, err := app.Test(bannedReq, -1)
-	require.NoError(t, err)
-	assert.Equal(t, fiber.StatusUnprocessableEntity, bannedRes.StatusCode)
+	t.Run("banned user", func(t *testing.T) {
+		bannedReqBody, err := json.Marshal(authRequest{
+			Username: "banned",
+			Password: "test",
+		})
+		require.NoError(t, err)
 
-	bannedBodyBytes, err := io.ReadAll(bannedRes.Body)
-	require.NoError(t, err)
+		bannedReq, _ := http.NewRequest(
+			http.MethodPost,
+			"/auth/login",
+			bytes.NewReader(bannedReqBody),
+		)
+		bannedReq.Header.Add("Content-Type", "application/json")
+		bannedRes, err := app.Test(bannedReq, -1)
+		require.NoError(t, err)
+		assert.Equal(t, fiber.StatusUnprocessableEntity, bannedRes.StatusCode)
 
-	var bannedBody map[string]any
-	err = json.Unmarshal(bannedBodyBytes, &bannedBody)
-	require.NoError(t, err)
+		bannedBodyBytes, err := io.ReadAll(bannedRes.Body)
+		require.NoError(t, err)
 
-	assert.NotEmpty(t, bannedBody["message"])
-	assert.NotEmpty(t, bannedBody["reason"])
-	assert.Equal(t, "banned", bannedBody["reason"])
-	assert.Equal(t, "user is banned", bannedBody["message"])
+		var bannedBody map[string]any
+		err = json.Unmarshal(bannedBodyBytes, &bannedBody)
+		require.NoError(t, err)
+
+		assert.NotEmpty(t, bannedBody["message"])
+		assert.NotEmpty(t, bannedBody["reason"])
+		assert.Equal(t, "banned", bannedBody["reason"])
+		assert.Equal(t, "user is banned", bannedBody["message"])
+	})
 }
 
 func TestHandler_RegisterHandler(t *testing.T) {
 	var app, handler = setup()
 	app.Post("/auth/register", handler.RegisterHandler)
 
-	noArgsReq, _ := http.NewRequest(
-		http.MethodPost,
-		"/auth/register",
-		nil,
-	)
+	t.Run("register with no args", func(t *testing.T) {
+		noArgsReq, _ := http.NewRequest(
+			http.MethodPost,
+			"/auth/register",
+			nil,
+		)
 
-	noArgsRes, err := app.Test(noArgsReq, -1)
+		noArgsRes, err := app.Test(noArgsReq, -1)
 
-	require.NoError(t, err)
-	assert.Equal(t, fiber.StatusBadRequest, noArgsRes.StatusCode)
-
-	// //
-	reqBody, err := json.Marshal(registerRequest{
-		Email:    gofakeit.Email(),
-		Password: gofakeit.Password(true, false, false, false, false, 10),
+		require.NoError(t, err)
+		assert.Equal(t, fiber.StatusBadRequest, noArgsRes.StatusCode)
 	})
-	require.NoError(t, err)
-	req, _ := http.NewRequest(
-		http.MethodPost,
-		"/auth/register",
-		bytes.NewReader(reqBody),
-	)
-	req.Header.Add("Content-Type", "application/json")
-	res, err := app.Test(req, -1)
 
-	require.NoError(t, err)
-	assert.Equal(t, fiber.StatusCreated, res.StatusCode)
+	t.Run("register success", func(t *testing.T) {
+		reqBody, err := json.Marshal(registerRequest{
+			Email:    gofakeit.Email(),
+			Password: gofakeit.Password(true, false, false, false, false, 10),
+		})
+		require.NoError(t, err)
+		req, _ := http.NewRequest(
+			http.MethodPost,
+			"/auth/register",
+			bytes.NewReader(reqBody),
+		)
+		req.Header.Add("Content-Type", "application/json")
+		res, err := app.Test(req, -1)
 
-	// //
-	validationReq, err := json.Marshal(registerRequest{
-		Email:    gofakeit.Username(),
-		Password: gofakeit.Password(true, false, false, false, false, 10),
+		require.NoError(t, err)
+		assert.Equal(t, fiber.StatusCreated, res.StatusCode)
 	})
-	require.NoError(t, err)
-	invalidReq, _ := http.NewRequest(
-		http.MethodPost,
-		"/auth/register",
-		bytes.NewReader(validationReq),
-	)
-	invalidReq.Header.Add("Content-Type", "application/json")
-	invalidRes, err := app.Test(invalidReq, -1)
 
-	require.NoError(t, err)
-	assert.Equal(t, fiber.StatusBadRequest, invalidRes.StatusCode)
+	t.Run("validation does not pass", func(t *testing.T) {
+		validationReq, err := json.Marshal(registerRequest{
+			Email:    gofakeit.Username(),
+			Password: gofakeit.Password(true, false, false, false, false, 10),
+		})
+		require.NoError(t, err)
+		invalidReq, _ := http.NewRequest(
+			http.MethodPost,
+			"/auth/register",
+			bytes.NewReader(validationReq),
+		)
+		invalidReq.Header.Add("Content-Type", "application/json")
+		invalidRes, err := app.Test(invalidReq, -1)
+
+		require.NoError(t, err)
+		assert.Equal(t, fiber.StatusBadRequest, invalidRes.StatusCode)
+	})
 }
 
 func TestHandler_ChangeUsernameHandler(t *testing.T) {
@@ -309,33 +316,35 @@ func TestHandler_ChangeUsernameHandler(t *testing.T) {
 	}))
 	app.Patch("/api/user/username", handler.ChangeUsernameHandler)
 
-	var reqBody, err = json.Marshal(usernameRequest{Username: gofakeit.Username()})
-	require.NoError(t, err)
+	t.Run("change username handler", func(t *testing.T) {
+		var reqBody, err = json.Marshal(usernameRequest{Username: gofakeit.Username()})
+		require.NoError(t, err)
 
-	req, _ := http.NewRequest(
-		http.MethodPatch,
-		"/api/user/username",
-		bytes.NewReader(reqBody),
-	)
+		req, _ := http.NewRequest(
+			http.MethodPatch,
+			"/api/user/username",
+			bytes.NewReader(reqBody),
+		)
 
-	usr, err := handler.UserRepository.GetByUsername(t.Context(), "test")
-	require.NoError(t, err)
-	token, err := auth.GenerateJWT(cfg, usr.ID)
-	require.NoError(t, err)
+		usr, err := handler.UserRepository.GetByUsername(t.Context(), "test")
+		require.NoError(t, err)
+		token, err := auth.GenerateJWT(cfg, usr.ID)
+		require.NoError(t, err)
 
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer "+token)
-	res, err := app.Test(req, -1)
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", "Bearer "+token)
+		res, err := app.Test(req, -1)
 
-	require.NoError(t, err)
-	require.Equal(t, fiber.StatusOK, res.StatusCode)
+		require.NoError(t, err)
+		require.Equal(t, fiber.StatusOK, res.StatusCode)
 
-	bodyBytes, err := io.ReadAll(res.Body)
-	require.NoError(t, err)
+		bodyBytes, err := io.ReadAll(res.Body)
+		require.NoError(t, err)
 
-	var body map[string]any
-	err = json.Unmarshal(bodyBytes, &body)
-	require.NoError(t, err)
+		var body map[string]any
+		err = json.Unmarshal(bodyBytes, &body)
+		require.NoError(t, err)
+	})
 }
 
 func TestHandler_GetHandler(t *testing.T) {
@@ -347,31 +356,33 @@ func TestHandler_GetHandler(t *testing.T) {
 	}))
 	app.Get("/api/user", handler.GetHandler)
 
-	req, _ := http.NewRequest(
-		http.MethodGet,
-		"/api/user",
-		nil,
-	)
+	t.Run("get user", func(t *testing.T) {
+		req, _ := http.NewRequest(
+			http.MethodGet,
+			"/api/user",
+			nil,
+		)
 
-	usr, err := handler.UserRepository.GetByUsername(t.Context(), "test")
-	require.NoError(t, err)
-	token, err := auth.GenerateJWT(cfg, usr.ID)
-	require.NoError(t, err)
+		usr, err := handler.UserRepository.GetByUsername(t.Context(), "test")
+		require.NoError(t, err)
+		token, err := auth.GenerateJWT(cfg, usr.ID)
+		require.NoError(t, err)
 
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer "+token)
-	res, err := app.Test(req, -1)
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", "Bearer "+token)
+		res, err := app.Test(req, -1)
 
-	require.NoError(t, err)
-	require.Equal(t, fiber.StatusOK, res.StatusCode)
+		require.NoError(t, err)
+		require.Equal(t, fiber.StatusOK, res.StatusCode)
 
-	bodyBytes, err := io.ReadAll(res.Body)
-	require.NoError(t, err)
+		bodyBytes, err := io.ReadAll(res.Body)
+		require.NoError(t, err)
 
-	var body map[string]any
-	err = json.Unmarshal(bodyBytes, &body)
-	require.NoError(t, err)
-	assert.NotEmpty(t, body["user"])
+		var body map[string]any
+		err = json.Unmarshal(bodyBytes, &body)
+		require.NoError(t, err)
+		assert.NotEmpty(t, body["user"])
+	})
 }
 
 func TestHandler_ChangePasswordHandler(t *testing.T) {
@@ -383,34 +394,36 @@ func TestHandler_ChangePasswordHandler(t *testing.T) {
 	}))
 	app.Patch("/api/user/password", handler.ChangePasswordHandler)
 
-	var reqBody, err = json.Marshal(changePasswordRequest{
-		Password:    "test",
-		NewPassword: gofakeit.Password(true, false, false, false, false, 10)},
-	)
-	require.NoError(t, err)
+	t.Run("change password handler", func(t *testing.T) {
+		var reqBody, err = json.Marshal(changePasswordRequest{
+			Password:    "test",
+			NewPassword: gofakeit.Password(true, false, false, false, false, 10)},
+		)
+		require.NoError(t, err)
 
-	req, _ := http.NewRequest(
-		http.MethodPatch,
-		"/api/user/password",
-		bytes.NewReader(reqBody),
-	)
+		req, _ := http.NewRequest(
+			http.MethodPatch,
+			"/api/user/password",
+			bytes.NewReader(reqBody),
+		)
 
-	usr, err := handler.UserRepository.GetByUsername(t.Context(), "test")
-	require.NoError(t, err)
-	token, err := auth.GenerateJWT(cfg, usr.ID)
-	require.NoError(t, err)
+		usr, err := handler.UserRepository.GetByUsername(t.Context(), "test")
+		require.NoError(t, err)
+		token, err := auth.GenerateJWT(cfg, usr.ID)
+		require.NoError(t, err)
 
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer "+token)
-	res, err := app.Test(req, -1)
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", "Bearer "+token)
+		res, err := app.Test(req, -1)
 
-	require.NoError(t, err)
-	require.Equal(t, fiber.StatusOK, res.StatusCode)
+		require.NoError(t, err)
+		require.Equal(t, fiber.StatusOK, res.StatusCode)
 
-	bodyBytes, err := io.ReadAll(res.Body)
-	require.NoError(t, err)
+		bodyBytes, err := io.ReadAll(res.Body)
+		require.NoError(t, err)
 
-	var body map[string]any
-	err = json.Unmarshal(bodyBytes, &body)
-	require.NoError(t, err)
+		var body map[string]any
+		err = json.Unmarshal(bodyBytes, &body)
+		require.NoError(t, err)
+	})
 }
