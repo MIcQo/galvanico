@@ -5,15 +5,15 @@ import (
 	"github.com/uptrace/bun"
 )
 
-type Resource struct {
+type Resources struct {
 	bun.BaseModel `bun:"table:user_resources,alias:ur"`
 
-	UserID         uuid.UUID
-	Gold           float64
-	Ships          int
-	AvailableShips int
-	Electricity    float64
-	MaxElectricity float64
-	Waste          float64
-	MaxWaste       float64
+	UserID             uuid.UUID `bun:"type:uuid,pk,default:gen_random_uuid()"`
+	Gold               int
+	TrainCars          int
+	AvailableTrainCars int
+	Electricity        float64
+	MaxElectricity     float64
+	Waste              float64
+	MaxWaste           float64
 }

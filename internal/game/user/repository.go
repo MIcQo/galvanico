@@ -2,16 +2,25 @@ package user
 
 import (
 	"context"
+	"errors"
+	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
 
+var ErrDuplicateEntry = errors.New("duplicate entry")
+
 type Repository interface {
 	GetByUsername(ctx context.Context, username string) (*User, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*User, error)
+	Create(ctx context.Context, user *User) error
 	AddFeature(ctx context.Context, feature *Feature) error
 	RemoveFeature(ctx context.Context, feature *Feature) error
+	UpdateLastLogin(ctx context.Context, user *User, ip string) error
+	ChangeUsername(ctx context.Context, user *User) error
+	ChangePassword(ctx context.Context, user *User) error
 }
 
 type RepositoryImpl struct {
@@ -23,7 +32,7 @@ func (r *RepositoryImpl) GetByUsername(ctx context.Context, username string) (*U
 	var query = r.db.NewSelect().Model(&user).
 		Relation("Features").
 		Relation("Resources").
-		Where("username = ?", username)
+		Where("username = ? OR email = ?", username, username)
 
 	if err := query.Scan(ctx); err != nil {
 		return nil, err
@@ -55,6 +64,43 @@ func (r *RepositoryImpl) AddFeature(ctx context.Context, feature *Feature) error
 
 func (r *RepositoryImpl) RemoveFeature(ctx context.Context, feature *Feature) error {
 	if _, err := r.db.NewDelete().Model(feature).Exec(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RepositoryImpl) UpdateLastLogin(ctx context.Context, user *User, ip string) error {
+	user.LastLoginIP.Valid = true
+	user.LastLoginIP.String = ip
+	user.LastLogin.Valid = true
+	user.LastLogin.Time = time.Now().UTC()
+
+	if _, err := r.db.NewUpdate().Model(user).Column("last_login", "last_login_ip").WherePK().Exec(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RepositoryImpl) Create(ctx context.Context, user *User) error {
+	if _, err := r.db.NewInsert().Model(user).Exec(ctx); err != nil {
+		if strings.Contains(err.Error(), "duplicate") {
+			return ErrDuplicateEntry
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (r *RepositoryImpl) ChangeUsername(ctx context.Context, user *User) error {
+	if _, err := r.db.NewUpdate().Model(user).Column("username").Exec(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RepositoryImpl) ChangePassword(ctx context.Context, user *User) error {
+	if _, err := r.db.NewUpdate().Model(user).Column("password").Exec(ctx); err != nil {
 		return err
 	}
 	return nil
