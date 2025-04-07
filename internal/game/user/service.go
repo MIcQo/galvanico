@@ -28,10 +28,11 @@ type Service interface {
 
 type ServiceIml struct {
 	UserRepository Repository
+	Publisher      broker.Publisher
 }
 
-func NewService(userRepository Repository) Service {
-	return &ServiceIml{UserRepository: userRepository}
+func NewService(userRepository Repository, publisher broker.Publisher) Service {
+	return &ServiceIml{UserRepository: userRepository, Publisher: publisher}
 }
 
 func (s *ServiceIml) GetUser(ctx context.Context, token *jwt.Token) (*User, error) {
@@ -60,7 +61,7 @@ func (s *ServiceIml) SendActivationEmail(email *notifications.ActivationEmail) e
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	if pubErr := broker.Connection().Publish("channels.email", u); pubErr != nil {
+	if pubErr := s.Publisher.Publish("channels.email", u); pubErr != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, pubErr.Error())
 	}
 

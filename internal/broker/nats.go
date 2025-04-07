@@ -65,3 +65,19 @@ func natsErrHandler(_ *nats.Conn, sub *nats.Subscription, natsErr error) {
 		// TODO: Log error, notify operations...
 	}
 }
+
+type Publisher interface {
+	Publish(string, []byte) error
+}
+
+type NatsPublisher struct {
+	broker *nats.Conn
+}
+
+func NewNatsPublisher(broker *nats.Conn) *NatsPublisher {
+	return &NatsPublisher{broker: broker}
+}
+
+func (n *NatsPublisher) Publish(channel string, bytes []byte) error {
+	return n.broker.Publish(channel, bytes)
+}

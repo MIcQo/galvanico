@@ -108,7 +108,8 @@ func registerUnauthorizedRoutes(app *fiber.App, cfg *config.Config) {
 	app.Use(prometheus.Middleware)
 
 	var userRepo = user.NewUserRepository(database.Connection())
-	var userHandler = user.NewHandler(userRepo, user.NewService(userRepo), cfg)
+	var publisher = broker.NewNatsPublisher(broker.Connection())
+	var userHandler = user.NewHandler(userRepo, user.NewService(userRepo, publisher), cfg)
 
 	var ag = app.Group("/auth")
 	{
@@ -126,7 +127,8 @@ func registerAuthorizedRoutes(app *fiber.App, cfg *config.Config) {
 	}))
 
 	var userRepo = user.NewUserRepository(database.Connection())
-	var userHandler = user.NewHandler(userRepo, user.NewService(userRepo), cfg)
+	var publisher = broker.NewNatsPublisher(broker.Connection())
+	var userHandler = user.NewHandler(userRepo, user.NewService(userRepo, publisher), cfg)
 
 	var api = app.Group("/api")
 	{

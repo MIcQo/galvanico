@@ -12,13 +12,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type fakePublisher struct{}
+
+func (f fakePublisher) Publish(_ string, _ []byte) error {
+	return nil
+}
+
 func TestServiceIml_Register(t *testing.T) {
 	var svc = NewService(&fakerUserRepository{data: map[string]*User{
 		"test": {
 			ID:       uuid.MustParse("ebfc76b7-7ace-4034-a8b6-cc369afa8fb8"),
 			Username: "test",
 		},
-	}})
+	}}, &fakePublisher{})
 
 	t.Run("valid", func(t *testing.T) {
 		var err = svc.Register(t.Context(), &User{
@@ -53,7 +59,8 @@ func TestServiceIml_GetUser(t *testing.T) {
 			ID:       uuid.MustParse("ebfc76b7-7ace-4034-a8b6-cc369afa8fb8"),
 			Username: "test",
 		},
-	}})
+	}}, &fakePublisher{})
+
 	t.Run("valid", func(t *testing.T) {
 		var token = jwt.NewWithClaims(
 			jwt.SigningMethodHS256,
