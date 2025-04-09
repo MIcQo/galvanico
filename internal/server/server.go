@@ -6,6 +6,7 @@ import (
 	"galvanico/internal/broker"
 	"galvanico/internal/config"
 	"galvanico/internal/database"
+	"galvanico/internal/game/city"
 	"galvanico/internal/game/user"
 	"time"
 
@@ -127,8 +128,11 @@ func registerAuthorizedRoutes(app *fiber.App, cfg *config.Config) {
 	}))
 
 	var userRepo = user.NewUserRepository(database.Connection())
+	var cityRepo = city.NewRepository(database.Connection())
 	var publisher = broker.NewNatsPublisher(broker.Connection())
-	var userHandler = user.NewHandler(userRepo, user.NewService(userRepo, publisher), cfg)
+	var userService = user.NewService(userRepo, publisher)
+	var userHandler = user.NewHandler(userRepo, userService, cfg)
+	var cityHandler = city.NewHandler(cityRepo, city.NewService(), userService)
 
 	var api = app.Group("/api")
 	{
@@ -137,6 +141,10 @@ func registerAuthorizedRoutes(app *fiber.App, cfg *config.Config) {
 			usr.Get("", userHandler.GetHandler)
 			usr.Patch("/username", userHandler.ChangeUsernameHandler)
 			usr.Patch("/password", userHandler.ChangePasswordHandler)
+		}
+		var ct = api.Group("/city")
+		{
+			ct.Get("", cityHandler.HandleGetUserCities)
 		}
 	}
 }
