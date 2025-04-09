@@ -16,6 +16,12 @@ interface tokenResponse {
 }
 
 const login = async () => {
+  // Basic validation
+  if (!email.value || !password.value) {
+    alert.open(t('auth.errors.invalidInput'), AlertType.warning);
+    return;
+  }
+
   const user = await defaultInstance.post('auth/login', {
     json: {username: email.value, password: password.value},
     noAuthHeader: true,
@@ -24,14 +30,17 @@ const login = async () => {
       alert.open(t('global.errors.errorOccurred'), AlertType.danger)
     } else {
       const errorData = await r.response.json();
-      console.log(errorData);
       alert.open(t(`auth.responses.${errorData.message}`), AlertType.warning)
     }
-  }) as tokenResponse;
+    return null;
+  }) as tokenResponse | null;
 
-  alert.open(t('auth.alert.successLogin'), AlertType.success)
-  localStorage.setItem("token", JSON.stringify(user.token));
-  router.push("/");
+  if (user && user.token) {
+    alert.open(t('auth.alert.successLogin'), AlertType.success)
+    localStorage.setItem("token", JSON.stringify(user.token));
+    await router.push("/");
+  }
+
 }
 
 </script>

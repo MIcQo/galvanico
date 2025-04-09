@@ -3,10 +3,12 @@ import {AlertType, useAlert} from "@/stores/alert.ts";
 import {defaultInstance} from "@/services/api.ts";
 import {ref} from "vue";
 import {useI18n} from "vue-i18n";
+import {useRouter} from "vue-router";
 
 const {t} = useI18n()
-
+const router = useRouter();
 const alert = useAlert();
+
 const email = ref<string>();
 const password = ref<string>();
 const confirmPassword = ref<string>();
@@ -30,7 +32,7 @@ const register = async (e: Event) => {
 
   console.log(password.value, email.value, confirmPassword.value)
 
-  const user = await defaultInstance.post('auth/register', {
+  await defaultInstance.post('auth/register', {
     json: {Email: email.value, Password: password.value},
     noAuthHeader: true,
   }).json().catch(async (r) => {
@@ -44,6 +46,7 @@ const register = async (e: Event) => {
   });
   alert.open(t('auth.alert.successRegister'), AlertType.success)
 
+  await router.push({name: 'auth.login'})
 }
 </script>
 

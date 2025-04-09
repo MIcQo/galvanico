@@ -14,8 +14,10 @@ const alertClass = computed(() => {
 </script>
 
 <template>
-  <div v-if="alert.isOpen" class="absolute top-0 left-50" style="transform: translateX(50%);">
-    <div role="alert" class="alert" :class="alertClass">
+  <div v-if="alert.isOpen"
+       class="absolute top-0 left-50 w-auto max-w-md transition-all duration-300"
+       style="transform: translateX(50%);">
+    <div role="alert" class="alert" :class="alertClass" aria-live="assertive">
       <svg v-if="alert.alertType === AlertType.success" xmlns="http://www.w3.org/2000/svg"
            class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

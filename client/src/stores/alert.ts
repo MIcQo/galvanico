@@ -12,7 +12,7 @@ export const useAlert = defineStore('alert', () => {
   let message = ref('');
   let alertType = ref(AlertType.success);
 
-  let timeoutHandler = null;
+  let timeoutHandler: ReturnType<typeof setTimeout> | null = null;
 
   function open(msg: string, type: AlertType = AlertType.success, timeout: number = 5): void {
     isOpen.value = true
