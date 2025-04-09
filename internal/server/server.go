@@ -7,8 +7,9 @@ import (
 	"galvanico/internal/config"
 	"galvanico/internal/database"
 	"galvanico/internal/game/user"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"time"
+
+	"github.com/gofiber/fiber/v2/middleware/cors"
 
 	"github.com/rs/zerolog"
 
