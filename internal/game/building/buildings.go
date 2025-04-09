@@ -3,6 +3,8 @@ package building
 import (
 	"fmt"
 	"strings"
+
+	"github.com/goccy/go-json"
 )
 
 type Building uint
@@ -13,6 +15,10 @@ func (b Building) String() string {
 		return "unknown"
 	}
 	return buildingNames[b]
+}
+
+func (b Building) MarshalJSON() ([]byte, error) {
+	return json.Marshal(b.String())
 }
 
 const (
