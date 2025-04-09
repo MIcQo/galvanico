@@ -55,7 +55,13 @@ func NewServer() *fiber.App {
 		},
 	})
 
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		// in the future, replace with http://localhost:5173, http://localhost:8080, https://galvanico.io
+		AllowOrigins:     "*",
+		AllowMethods:     "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
+		AllowCredentials: false, // need to switch to true for production
+	}))
 
 	app.Use(fiberzerolog.New(fiberzerolog.Config{
 		Logger: &log.Logger,
