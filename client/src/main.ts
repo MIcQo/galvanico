@@ -9,7 +9,7 @@ import router from './router'
 import locale from "@/locale";
 
 const i18n = createI18n({
-  locale: 'sk',
+  locale: 'en',
   fallbackLocale: 'en',
   messages: locale,
 })
