@@ -7,6 +7,7 @@ import (
 	"galvanico/internal/config"
 	"galvanico/internal/database"
 	"galvanico/internal/game/user"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -52,6 +53,8 @@ func NewServer() *fiber.App {
 			return c.Status(code).JSON(fiber.Map{"message": err.Error()})
 		},
 	})
+
+	app.Use(cors.New())
 
 	app.Use(fiberzerolog.New(fiberzerolog.Config{
 		Logger: &log.Logger,

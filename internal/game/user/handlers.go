@@ -125,6 +125,9 @@ func (h *Handler) RegisterHandler(ctx *fiber.Ctx) error {
 	}
 
 	if err := h.Service.Register(ctx.Context(), usr); err != nil {
+		if errors.Is(err, ErrAlreadyExists) {
+			return fiber.NewError(fiber.StatusConflict, err.Error())
+		}
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
