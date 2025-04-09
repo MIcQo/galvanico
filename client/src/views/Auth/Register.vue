@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {AlertType, useAlert} from "@/stores/alert.ts";
-import {defaultInstance} from "@/services/api.ts";
+import {defaultInstance, type HttpRequestOptions} from "@/services/api.ts";
 import {ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
@@ -32,10 +32,12 @@ const register = async (e: Event) => {
 
   console.log(password.value, email.value, confirmPassword.value)
 
-  await defaultInstance.post('auth/register', {
+  const opts: HttpRequestOptions = {
     json: {Email: email.value, Password: password.value},
     noAuthHeader: true,
-  }).json().catch(async (r) => {
+  }
+
+  await defaultInstance.post('auth/register', opts).json().catch(async (r) => {
     if (r.response.status >= 500) {
       alert.open(t('global.errors.errorOccurred'), AlertType.danger)
     } else {

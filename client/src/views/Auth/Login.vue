@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {defaultInstance} from "@/services/api.ts";
+import {defaultInstance, type HttpRequestOptions} from "@/services/api.ts";
 import {AlertType, useAlert} from "@/stores/alert.ts";
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
@@ -22,10 +22,12 @@ const login = async () => {
     return;
   }
 
-  const user = await defaultInstance.post('auth/login', {
+  const opts: HttpRequestOptions = {
     json: {username: email.value, password: password.value},
     noAuthHeader: true,
-  }).json().catch(async (r) => {
+  }
+
+  const user = await defaultInstance.post('auth/login', opts).json().catch(async (r) => {
     if (r.response.status >= 500) {
       alert.open(t('global.errors.errorOccurred'), AlertType.danger)
     } else {

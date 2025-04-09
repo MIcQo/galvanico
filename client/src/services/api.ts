@@ -26,4 +26,4 @@ const authInstance = defaultInstance.extend({
   },
 })
 
-export {defaultInstance, authInstance};
+export {defaultInstance, authInstance, type HttpRequestOptions};
