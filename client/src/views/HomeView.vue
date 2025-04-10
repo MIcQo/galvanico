@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {isAuthenticated} from "@/services/auth.ts";
 </script>
 
 <template>
@@ -9,7 +10,10 @@
         <p class="py-6">
           Open-source game inspired by Ikariam
         </p>
-        <RouterLink :to="{name:`auth.register`}" class="btn btn-primary">Get Started</RouterLink>
+        <RouterLink :to="{name: isAuthenticated() ? `game.index` : `auth.register`}"
+                    class="btn btn-primary">
+          {{ $t('index.getStarted') }}
+        </RouterLink>
       </div>
     </div>
   </div>

@@ -73,7 +73,9 @@ const login = async () => {
   </div>
   <div class="card-actions justify-center">
     <!-- TODO: in the future   <a href="#" class="text-center">Forgot password?</a>-->
-    <button @click="login" class="btn btn-primary w-full">{{ $t('auth.login') }}</button>
+    <button :disabled="!email || !password" @click="login" class="btn btn-primary w-full">
+      {{ $t('auth.login') }}
+    </button>
     <RouterLink :to="{name: 'auth.register'}" class="text-center">{{
         $t('auth.doesNotHaveAccount')
       }}

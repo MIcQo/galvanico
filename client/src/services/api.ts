@@ -1,13 +1,5 @@
 import ky, {type Options} from 'ky';
 
-const defaultInstance = ky.create({
-  prefixUrl: import.meta.env.VITE_BACKEND_URL,
-});
-
-interface HttpRequestOptions extends Options {
-  noAuthHeader?: boolean;
-}
-
 const authorizationMiddleware = async (request: Request): Promise<void> => {
   const options = request as Request & HttpRequestOptions;
   if (options.noAuthHeader) {
@@ -20,10 +12,15 @@ const authorizationMiddleware = async (request: Request): Promise<void> => {
   }
 };
 
-const authInstance = defaultInstance.extend({
+const defaultInstance = ky.create({
+  prefixUrl: import.meta.env.VITE_BACKEND_URL,
   hooks: {
     beforeRequest: [authorizationMiddleware],
   },
-})
+});
 
-export {defaultInstance, authInstance, type HttpRequestOptions};
+interface HttpRequestOptions extends Options {
+  noAuthHeader?: boolean;
+}
+
+export {defaultInstance, type HttpRequestOptions};

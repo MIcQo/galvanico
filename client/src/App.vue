@@ -6,7 +6,11 @@ import Alert from "@/components/Alert.vue";
 <template>
   <Alert/>
 
-  <RouterView/>
+  <RouterView v-slot="{Component}">
+    <transition name="fade">
+      <component :is="Component"/>
+    </transition>
+  </RouterView>
 </template>
 
 <style scoped>

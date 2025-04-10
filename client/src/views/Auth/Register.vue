@@ -88,7 +88,9 @@ const register = async (e: Event) => {
     </label>
   </div>
   <div class="card-actions justify-center">
-    <button @click="register" class="btn btn-primary w-full">{{ $t("auth.register") }}</button>
+    <button :disabled="!email || !password || !confirmPassword" @click="register"
+            class="btn btn-primary w-full">{{ $t("auth.register") }}
+    </button>
     <RouterLink :to="{name: 'auth.login'}" class="text-center">{{ $t("auth.alreadyHaveAccount") }}
     </RouterLink>
   </div>

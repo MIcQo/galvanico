@@ -17,7 +17,11 @@ onMounted(() => {
       <div class="card-body">
         <h1>Galvanico</h1>
 
-        <RouterView/>
+        <RouterView v-slot="{Component}">
+          <transition name="fade">
+            <component :is="Component"/>
+          </transition>
+        </RouterView>
       </div>
     </div>
   </div>
