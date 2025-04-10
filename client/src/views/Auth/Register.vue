@@ -39,11 +39,6 @@ const register = async (e: Event) => {
     alert.open(t("auth.errors.passwordMismatch"), AlertType.warning);
     return
   }
-  
-  // Additional logic for successful registration can go here
-}
-
-  console.log(password.value, email.value, confirmPassword.value)
 
   const opts: HttpRequestOptions = {
     json: {Email: email.value, Password: password.value},
