@@ -1,6 +1,6 @@
 services:
   cockroach:
-    image: cockroachdb/cockroach:latest@sha256:90463eb46726908959dceb97c2a6b555db7701bc43aa166d4990b1ad8892a9da
+    image: cockroachdb/cockroach:latest@sha256:0a2671147906da20d81e05df39af7eea8f0d3d1e57327d4285cc513613620703
     ports:
       - "26257:26257"
       - "25255:8080"
