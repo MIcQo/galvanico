@@ -13,6 +13,11 @@ const email = ref<string>();
 const password = ref<string>();
 const confirmPassword = ref<string>();
 
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 const register = async (e: Event) => {
   if (email.value === '' ||
     email.value === undefined ||
@@ -25,10 +30,18 @@ const register = async (e: Event) => {
     return
   }
 
+  if (email.value && !isValidEmail(email.value)) {
+    alert.open(t('auth.errors.invalidEmail'), AlertType.warning)
+    return
+  }
+
   if (password.value !== confirmPassword.value) {
     alert.open(t("auth.errors.passwordMismatch"), AlertType.warning);
     return
   }
+  
+  // Additional logic for successful registration can go here
+}
 
   console.log(password.value, email.value, confirmPassword.value)
 
