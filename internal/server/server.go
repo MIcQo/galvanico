@@ -7,6 +7,7 @@ import (
 	"galvanico/internal/config"
 	"galvanico/internal/database"
 	"galvanico/internal/game/user"
+	"sync"
 	"time"
 
 	"github.com/ansrivas/fiberprometheus/v2"
@@ -24,6 +25,13 @@ import (
 
 const (
 	idleTimeout = 5 * time.Second
+)
+
+var (
+	lastReadinessCheck     time.Time
+	lastReadinessResult    bool
+	readinessCheckMutex    sync.Mutex
+	readinessCheckInterval = 10 * time.Second
 )
 
 func NewServer() *fiber.App {
@@ -75,7 +83,18 @@ func NewServer() *fiber.App {
 			return true
 		},
 		ReadinessProbe: func(ctx *fiber.Ctx) bool {
-			return database.Connection().PingContext(ctx.Context()) == nil && broker.Connection().IsConnected()
+			readinessCheckMutex.Lock()
+			defer readinessCheckMutex.Unlock()
+
+			now := time.Now()
+			if now.Sub(lastReadinessCheck) < readinessCheckInterval {
+				return lastReadinessResult
+			}
+
+			result := database.Connection().PingContext(ctx.Context()) == nil && broker.Connection().IsConnected()
+			lastReadinessCheck = now
+			lastReadinessResult = result
+			return result
 		},
 	}))
 
