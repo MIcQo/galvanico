@@ -7,7 +7,7 @@ import (
 
 var Migrations = migrate.NewMigrations()
 
-//go:embed sql
+//go:embed *.sql
 var migs embed.FS
 
 func init() {
