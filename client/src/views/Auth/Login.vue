@@ -4,6 +4,7 @@ import {defaultInstance, type HttpRequestOptions} from "@/services/api.ts";
 import {AlertType, useAlert} from "@/stores/alert.ts";
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
+import {setToken} from "@/services/auth.ts";
 
 const alert = useAlert();
 const {t} = useI18n();
@@ -39,7 +40,7 @@ const login = async () => {
 
   if (user && user.token) {
     alert.open(t('auth.alert.successLogin'), AlertType.success)
-    localStorage.setItem("token", JSON.stringify(user.token));
+    setToken(user.token)
     await router.push("/");
   }
 

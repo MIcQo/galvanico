@@ -1,4 +1,5 @@
 import ky, {type Options} from 'ky';
+import {getToken} from "@/services/auth.ts";
 
 const authorizationMiddleware = async (request: Request): Promise<void> => {
   const options = request as Request & HttpRequestOptions;
@@ -6,7 +7,7 @@ const authorizationMiddleware = async (request: Request): Promise<void> => {
     return;
   }
 
-  const token = localStorage.getItem("token");
+  const token = getToken();
   if (token) {
     request.headers.set('Authorization', `Bearer ${token}`);
   }

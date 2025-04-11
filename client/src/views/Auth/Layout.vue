@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {onMounted} from "vue";
 import {useRouter} from "vue-router";
+import {isAuthenticated} from "@/services/auth.ts";
 
 let router = useRouter();
 
 onMounted(() => {
-  if (localStorage.getItem("token")) {
+  if (isAuthenticated()) {
     router.push("/");
   }
 })
