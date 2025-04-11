@@ -1,6 +1,6 @@
 services:
   cockroach:
-    image: cockroachdb/cockroach:latest@sha256:90463eb46726908959dceb97c2a6b555db7701bc43aa166d4990b1ad8892a9da
+    image: cockroachdb/cockroach:latest@sha256:0a2671147906da20d81e05df39af7eea8f0d3d1e57327d4285cc513613620703
     ports:
       - "26257:26257"
       - "25255:8080"
@@ -12,7 +12,7 @@ services:
 #      COCKROACH_PASSWORD: "game"
 
   nats:
-    image: nats:latest@sha256:76fe53997736051e3511ddc26d585abd679fe3a30dbf74d19418bb0035fde031
+    image: nats:latest@sha256:031f9a7ed1e08524b3dff604bfaee5177baa95c25f039822b8d224a42373be4e
     ports:
       - "4222:4222"
       - "8222:8222"
