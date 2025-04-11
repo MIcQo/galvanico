@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"embed"
+
 	"github.com/uptrace/bun/migrate"
 )
 
