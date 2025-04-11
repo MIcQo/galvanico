@@ -102,9 +102,11 @@ const register = async (e: Event) => {
     </label>
   </div>
   <div class="card-actions justify-center">
-    <button type="submit" :disabled="!email || !password || !confirmPassword"
+    <button type="submit" :disabled="loading || !email || !password || !confirmPassword"
             @click.prevent="register"
-            class="btn btn-primary w-full">{{ $t("auth.register") }}
+            class="btn btn-primary w-full">
+      <span v-if="loading" class="loading loading-spinner"></span>
+      {{ $t("auth.register") }}
     </button>
     <RouterLink :to="{name: 'auth.login'}" class="text-center">{{ $t("auth.alreadyHaveAccount") }}
     </RouterLink>

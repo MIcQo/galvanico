@@ -1,6 +1,10 @@
 export default {
   index: {
-    getStarted: "Get started"
+    getStarted: "Get started",
+    imprint: "Open-source game inspired by Ikariam",
+  },
+  game: {
+    underConstruction: "This screen is still under construction.",
   },
   auth: {
     login: "Login",
@@ -17,6 +21,10 @@ export default {
       email: "E-mail",
       password: "Password",
       confirmPassword: "Confirm Password",
+    },
+
+    alert: {
+      logout: "You have logged out",
     },
   }
 };

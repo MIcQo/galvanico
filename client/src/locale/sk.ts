@@ -1,4 +1,8 @@
 export default {
+  index: {
+    imprint: "Open-Source hra inšpirovaná Ikariam-om",
+    getStarted: "Začať hneď!",
+  },
   auth: {
     login: "Prihlásiť sa",
     register: "Registrovať sa",

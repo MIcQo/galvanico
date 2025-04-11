@@ -8,7 +8,7 @@ import {isAuthenticated} from "@/services/auth.ts";
       <div class="max-w-md">
         <h1 class="text-5xl font-bold">Galvanico</h1>
         <p class="py-6">
-          Open-source game inspired by Ikariam
+          {{ $t('index.imprint') }}
         </p>
         <RouterLink :to="{name: isAuthenticated() ? `game.index` : `auth.register`}"
                     class="btn btn-primary">

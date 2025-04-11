@@ -10,4 +10,8 @@ const setToken = (token: string): void => {
   sessionStorage.setItem("token", token);
 }
 
-export {isAuthenticated, getToken, setToken};
+const removeToken = (): void => {
+  sessionStorage.removeItem("token");
+}
+
+export {isAuthenticated, getToken, setToken, removeToken};
