@@ -15,7 +15,7 @@
         "@types/node": "22.14.0",
         "@vitejs/plugin-vue": "5.2.3",
         "@vitejs/plugin-vue-jsx": "4.1.2",
-        "@vitest/eslint-plugin": "1.1.39",
+        "@vitest/eslint-plugin": "1.1.42",
         "@vue/eslint-config-prettier": "10.2.0",
         "@vue/eslint-config-typescript": "14.5.0",
         "@vue/test-utils": "2.4.6",
@@ -292,7 +292,7 @@
 
     "@vitejs/plugin-vue-jsx": ["@vitejs/plugin-vue-jsx@4.1.2", "", { "dependencies": { "@babel/core": "^7.26.7", "@babel/plugin-transform-typescript": "^7.26.7", "@vue/babel-plugin-jsx": "^1.2.5" }, "peerDependencies": { "vite": "^5.0.0 || ^6.0.0", "vue": "^3.0.0" } }, "sha512-4Rk0GdE0QCdsIkuMmWeg11gmM4x8UmTnZR/LWPm7QJ7+BsK4tq08udrN0isrrWqz5heFy9HLV/7bOLgFS8hUjA=="],
 
-    "@vitest/eslint-plugin": ["@vitest/eslint-plugin@1.1.39", "", { "peerDependencies": { "@typescript-eslint/utils": "^8.24.0", "eslint": ">= 8.57.0", "typescript": ">= 5.0.0", "vitest": "*" }, "optionalPeers": ["typescript", "vitest"] }, "sha512-l5/MUFCYI8nxwr62JHlWwXfeQNS8E7xy71lSLGQ3CrjGjBdWLs1Rtee+BvYwy2m4YVPwYqUwdcAIOaZOwPUpfg=="],
+    "@vitest/eslint-plugin": ["@vitest/eslint-plugin@1.1.42", "", { "peerDependencies": { "@typescript-eslint/utils": ">= 8.24.0", "eslint": ">= 8.57.0", "typescript": ">= 5.0.0", "vitest": "*" }, "optionalPeers": ["typescript"] }, "sha512-dTGNbh/angh+hoqp5L5A8YO/29mOXDXmDQ/1fzt/jiYzLvU6FvrMqJpGqMqh5g+Fz6MDoZi0AlxefnFUg93Q5A=="],
 
     "@vitest/expect": ["@vitest/expect@3.1.1", "", { "dependencies": { "@vitest/spy": "3.1.1", "@vitest/utils": "3.1.1", "chai": "^5.2.0", "tinyrainbow": "^2.0.0" } }, "sha512-q/zjrW9lgynctNbwvFtQkGK9+vvHA5UzVi2V8APrp1C6fG6/MuYYkmlx4FubuqLycCeSdHD5aadWfua/Vr0EUA=="],
 
