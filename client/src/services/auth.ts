@@ -2,7 +2,7 @@ const isAuthenticated = (): boolean => {
   return !!getToken();
 }
 
-const getToken = (): ?string => {
+const getToken = (): string | null => {
   return sessionStorage.getItem("token");
 }
 

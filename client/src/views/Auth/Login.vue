@@ -11,6 +11,7 @@ const {t} = useI18n();
 const router = useRouter();
 const email = ref("");
 const password = ref("");
+const loading = ref(false);
 
 interface tokenResponse {
   token: string
@@ -28,7 +29,11 @@ const login = async () => {
     noAuthHeader: true,
   }
 
-  const user = await defaultInstance.post('auth/login', opts).json().catch(async (r) => {
+  loading.value = true;
+
+  const user = await defaultInstance.post('auth/login', opts).json()
+    .catch(async (r) => {
+      loading.value = false;
     if (r.response.status >= 500) {
       alert.open(t('global.errors.errorOccurred'), AlertType.danger)
     } else {
@@ -38,20 +43,21 @@ const login = async () => {
     return null;
   }) as tokenResponse | null;
 
+  loading.value = false;
   if (user && user.token) {
     alert.open(t('auth.alert.successLogin'), AlertType.success)
     setToken(user.token)
     await router.push("/");
   }
-
 }
 
 </script>
 
 <template>
+  <form action="">
   <h2 class="card-title">{{ $t('auth.login') }}</h2>
   <div class="items-center mt-2">
-    <label class="input input-bordered flex items-center gap-2 mb-2">
+    <label class="w-full input input-bordered flex items-center gap-2 mb-2">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
            class="w-4 h-4 opacity-70">
         <path
@@ -61,7 +67,7 @@ const login = async () => {
       </svg>
       <input v-model="email" type="text" class="grow" :placeholder="$t('auth.fields.email')"/>
     </label>
-    <label class="input input-bordered flex items-center gap-2 mb-2">
+    <label class="w-full input input-bordered flex items-center gap-2 mb-2">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
            class="w-4 h-4 opacity-70">
         <path fill-rule="evenodd"
@@ -74,14 +80,16 @@ const login = async () => {
   </div>
   <div class="card-actions justify-center">
     <!-- TODO: in the future   <a href="#" class="text-center">Forgot password?</a>-->
-    <button :disabled="!email || !password" @click="login" class="btn btn-primary w-full">
+    <button type="submit" :disabled="loading || !email || !password" @click.prevent="login"
+            class="btn btn-primary w-full">
+      <span v-if="loading" class="loading loading-spinner"></span>
       {{ $t('auth.login') }}
     </button>
-    <RouterLink :to="{name: 'auth.register'}" class="text-center">{{
-        $t('auth.doesNotHaveAccount')
-      }}
+    <RouterLink :to="{name: 'auth.register'}" class="text-center">
+      {{ $t('auth.doesNotHaveAccount') }}
     </RouterLink>
   </div>
+  </form>
 </template>
 
 <style scoped>

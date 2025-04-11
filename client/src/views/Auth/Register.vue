@@ -12,6 +12,7 @@ const alert = useAlert();
 const email = ref<string>();
 const password = ref<string>();
 const confirmPassword = ref<string>();
+const loading = ref(false);
 
 const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,7 +46,10 @@ const register = async (e: Event) => {
     noAuthHeader: true,
   }
 
+  loading.value = true;
+
   await defaultInstance.post('auth/register', opts).json().catch(async (r) => {
+    loading.value = false;
     if (r.response.status >= 500) {
       alert.open(t('global.errors.errorOccurred'), AlertType.danger)
     } else {
@@ -54,16 +58,18 @@ const register = async (e: Event) => {
       alert.open(t(`auth.responses.${errorData.message}`), AlertType.warning)
     }
   });
-  alert.open(t('auth.alert.successRegister'), AlertType.success)
 
+  alert.open(t('auth.alert.successRegister'), AlertType.success)
+  loading.value = false;
   await router.push({name: 'auth.login'})
 }
 </script>
 
 <template>
+  <form>
   <h2 class="card-title">{{ $t("auth.register") }}</h2>
   <div class="items-center mt-2">
-    <label class="input input-bordered flex items-center gap-2 mb-2">
+    <label class="w-full input input-bordered flex items-center gap-2 mb-2">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
            class="w-4 h-4 opacity-70">
         <path
@@ -73,7 +79,7 @@ const register = async (e: Event) => {
       </svg>
       <input type="text" class="grow" v-model="email" :placeholder="$t('auth.fields.email')"/>
     </label>
-    <label class="input input-bordered flex items-center gap-2 mb-2">
+    <label class="w-full input input-bordered flex items-center gap-2 mb-2">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
            class="w-4 h-4 opacity-70">
         <path fill-rule="evenodd"
@@ -83,7 +89,7 @@ const register = async (e: Event) => {
       <input type="password" class="grow" v-model="password"
              :placeholder="$t('auth.fields.password')" value=""/>
     </label>
-    <label class="input input-bordered flex items-center gap-2 mb-2">
+    <label class="w-full input input-bordered flex items-center gap-2 mb-2">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
            class="w-4 h-4 opacity-70">
         <path fill-rule="evenodd"
@@ -96,12 +102,14 @@ const register = async (e: Event) => {
     </label>
   </div>
   <div class="card-actions justify-center">
-    <button :disabled="!email || !password || !confirmPassword" @click="register"
+    <button type="submit" :disabled="!email || !password || !confirmPassword"
+            @click.prevent="register"
             class="btn btn-primary w-full">{{ $t("auth.register") }}
     </button>
     <RouterLink :to="{name: 'auth.login'}" class="text-center">{{ $t("auth.alreadyHaveAccount") }}
     </RouterLink>
   </div>
+  </form>
 </template>
 
 <style scoped>
