@@ -9,18 +9,16 @@ import (
 	"galvanico/internal/game/user"
 	"time"
 
-	"github.com/gofiber/fiber/v2/middleware/cors"
-
-	"github.com/rs/zerolog"
-
 	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/contrib/fiberzerolog"
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -70,12 +68,36 @@ func NewServer() *fiber.App {
 	app.Use(requestid.New())
 	app.Use(recover.New())
 
-	registerUnauthorizedRoutes(app, cfg)
-	registerAuthorizedRoutes(app, cfg)
+	app.Use(healthcheck.New(healthcheck.Config{
+		LivenessEndpoint:  "/livez",
+		ReadinessEndpoint: "/readyz",
+		LivenessProbe: func(_ *fiber.Ctx) bool {
+			return true
+		},
+		ReadinessProbe: func(ctx *fiber.Ctx) bool {
+			return database.Connection().PingContext(ctx.Context()) == nil && broker.Connection().IsConnected()
+		},
+	}))
+
+	prometheus := fiberprometheus.NewWithDefaultRegistry(cfg.AppName)
+	prometheus.RegisterAt(app, "/metrics")
+	prometheus.SetSkipPaths([]string{"/ping", "/readyz", "/livez"})
+	app.Use(prometheus.Middleware)
+
+	registerAPIroutes(app, cfg)
+	registerStaticRoutes(app)
 
 	printRegisteredRoutes(app)
 
 	return app
+}
+
+func registerStaticRoutes(app *fiber.App) {
+	app.Static("/", "./public")
+
+	app.Get("/*", func(ctx *fiber.Ctx) error {
+		return ctx.SendFile("./public/index.html")
+	})
 }
 
 func printRegisteredRoutes(app *fiber.App) {
@@ -100,23 +122,15 @@ func printRegisteredRoutes(app *fiber.App) {
 	}
 }
 
-func registerUnauthorizedRoutes(app *fiber.App, cfg *config.Config) {
-	app.Use(healthcheck.New(healthcheck.Config{
-		LivenessEndpoint:  "/livez",
-		ReadinessEndpoint: "/readyz",
-		LivenessProbe: func(_ *fiber.Ctx) bool {
-			return true
-		},
-		ReadinessProbe: func(ctx *fiber.Ctx) bool {
-			return database.Connection().PingContext(ctx.Context()) == nil && broker.Connection().IsConnected()
-		},
-	}))
+func registerAPIroutes(app *fiber.App, cfg *config.Config) {
+	var g = app.Group("")
+	{
+		registerUnauthorizedRoutes(g, cfg)
+		registerAuthorizedRoutes(g, cfg)
+	}
+}
 
-	prometheus := fiberprometheus.NewWithDefaultRegistry(cfg.AppName)
-	prometheus.RegisterAt(app, "/metrics")
-	prometheus.SetSkipPaths([]string{"/ping", "/readyz", "/livez"})
-	app.Use(prometheus.Middleware)
-
+func registerUnauthorizedRoutes(app fiber.Router, cfg *config.Config) {
 	var userRepo = user.NewUserRepository(database.Connection())
 	var publisher = broker.NewNatsPublisher(broker.Connection())
 	var userHandler = user.NewHandler(userRepo, user.NewService(userRepo, publisher), cfg)
@@ -128,20 +142,19 @@ func registerUnauthorizedRoutes(app *fiber.App, cfg *config.Config) {
 	}
 }
 
-func registerAuthorizedRoutes(app *fiber.App, cfg *config.Config) {
+func registerAuthorizedRoutes(app fiber.Router, cfg *config.Config) {
 	var key = cfg.Auth.GetJWTKey()
-
-	app.Use(jwtware.New(jwtware.Config{
-		ErrorHandler: auth.ErrorHandler,
-		SigningKey:   jwtware.SigningKey{Key: key},
-	}))
-
 	var userRepo = user.NewUserRepository(database.Connection())
 	var publisher = broker.NewNatsPublisher(broker.Connection())
 	var userHandler = user.NewHandler(userRepo, user.NewService(userRepo, publisher), cfg)
 
 	var api = app.Group("/api")
 	{
+		api.Use(jwtware.New(jwtware.Config{
+			ErrorHandler: auth.ErrorHandler,
+			SigningKey:   jwtware.SigningKey{Key: key},
+		}))
+
 		var usr = api.Group("/user")
 		{
 			usr.Get("", userHandler.GetHandler)
