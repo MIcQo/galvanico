@@ -9,6 +9,8 @@ import (
 	"galvanico/internal/game/user"
 	"time"
 
+	"github.com/gofiber/fiber/v2/middleware/cors"
+
 	"github.com/rs/zerolog"
 
 	"github.com/ansrivas/fiberprometheus/v2"
@@ -52,6 +54,14 @@ func NewServer() *fiber.App {
 			return c.Status(code).JSON(fiber.Map{"message": err.Error()})
 		},
 	})
+
+	app.Use(cors.New(cors.Config{
+		// in the future, replace with http://localhost:5173, http://localhost:8080, https://galvanico.io
+		AllowOrigins:     "*",
+		AllowMethods:     "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
+		AllowCredentials: false, // need to switch to true for production
+	}))
 
 	app.Use(fiberzerolog.New(fiberzerolog.Config{
 		Logger: &log.Logger,
