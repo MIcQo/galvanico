@@ -13,3 +13,5 @@ helm-charts
 .editorconfig
 .idea
 coverage*
+test-results
+dist
