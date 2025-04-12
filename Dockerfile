@@ -27,14 +27,13 @@ COPY . .
 COPY --from=prerelease /temp/prod/dist public
 RUN go mod download
 RUN CGO_ENABLED=0 go build -o /go/bin/app
-CMD ["/go/bin/app", "serve"]
 
-#FROM busybox:uclibc AS busybox
-#
-#FROM gcr.io/distroless/base
-#WORKDIR /go
-#COPY --from=busybox /bin/ls /bin/ls
-#COPY --from=busybox /bin/sh /bin/sh
-#COPY --from=busybox /bin/stat /bin/stat
-#COPY --from=builder /go/bin/app /go/bin/app
-#CMD ["/go/bin/app", "serve"]
+FROM busybox:uclibc AS busybox
+
+FROM gcr.io/distroless/base
+WORKDIR /go
+COPY --from=busybox /bin/ls /bin/ls
+COPY --from=busybox /bin/sh /bin/sh
+COPY --from=busybox /bin/stat /bin/stat
+COPY --from=builder /go/bin/app /go/bin/app
+CMD ["/go/bin/app", "serve"]
