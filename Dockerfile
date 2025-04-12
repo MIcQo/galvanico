@@ -36,4 +36,5 @@ COPY --from=busybox /bin/ls /bin/ls
 COPY --from=busybox /bin/sh /bin/sh
 COPY --from=busybox /bin/stat /bin/stat
 COPY --from=builder /go/bin/app /go/bin/app
+COPY --from=builder /go/src/app/public /go/public
 CMD ["/go/bin/app", "serve"]
