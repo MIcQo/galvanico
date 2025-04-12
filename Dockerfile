@@ -8,7 +8,6 @@ WORKDIR /temp/prod
 COPY client/package.json client/bun.lock /temp/prod/
 RUN bun install --frozen-lockfile --production
 
-ENV VITE_BACKEND_URL=/
 FROM base AS prerelease
 WORKDIR /temp/prod
 COPY --from=install /temp/prod/node_modules node_modules
@@ -19,6 +18,7 @@ RUN if [ "$(uname -m)" = "aarch64" ]; then \
       bun install @rollup/rollup-linux-x64-musl --no-save; \
     fi
 ENV NODE_ENV=production
+ENV VITE_BACKEND_URL=/
 RUN bun run build-only
 
 FROM golang:1.24@sha256:1ecc479bc712a6bdb56df3e346e33edcc141f469f82840bab9f4bc2bc41bf91d AS builder
