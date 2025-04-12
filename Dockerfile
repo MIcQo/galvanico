@@ -8,6 +8,7 @@ WORKDIR /temp/prod
 COPY client/package.json client/bun.lock /temp/prod/
 RUN bun install --frozen-lockfile --production
 
+ENV VITE_BACKEND_URL=/
 FROM base AS prerelease
 WORKDIR /temp/prod
 COPY --from=install /temp/prod/node_modules node_modules
