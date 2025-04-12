@@ -12,13 +12,13 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         platform:
           - linux/amd64
           - linux/arm64
+    runs-on: ${{ matrix.platform != 'linux/arm64' && 'ubuntu-latest' || 'ubuntu-24.04-arm' }}
     steps:
       - name: Prepare
         run: |

@@ -23,16 +23,17 @@ RUN bun run build-only
 FROM golang:1.24@sha256:1ecc479bc712a6bdb56df3e346e33edcc141f469f82840bab9f4bc2bc41bf91d AS builder
 WORKDIR /go/src/app
 COPY . .
-COPY --from=prerelease /temp/prod/dist/ public/
+COPY --from=prerelease /temp/prod/dist public
 RUN go mod download
 RUN CGO_ENABLED=0 go build -o /go/bin/app
-
-FROM busybox:uclibc AS busybox
-
-FROM gcr.io/distroless/base
-WORKDIR /go
-COPY --from=busybox /bin/ls /bin/ls
-COPY --from=busybox /bin/sh /bin/sh
-COPY --from=busybox /bin/stat /bin/stat
-COPY --from=builder /go/bin/app /go/bin/app
 CMD ["/go/bin/app", "serve"]
+
+#FROM busybox:uclibc AS busybox
+#
+#FROM gcr.io/distroless/base
+#WORKDIR /go
+#COPY --from=busybox /bin/ls /bin/ls
+#COPY --from=busybox /bin/sh /bin/sh
+#COPY --from=busybox /bin/stat /bin/stat
+#COPY --from=builder /go/bin/app /go/bin/app
+#CMD ["/go/bin/app", "serve"]
