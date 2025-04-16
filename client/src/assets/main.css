@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "@/assets/buildings.css";
+
 @plugin "daisyui";
 
 
@@ -27,3 +29,241 @@
 .fade-enter-active, .fade-leave-active {
   transition: all 0.2s ease;
 }
+
+
+.locations .timetofinish {
+  z-index: 500;
+  position: absolute;
+  text-align: center;
+  line-height: 23px;
+  height: 23px;
+  background-image: url(https://s402-en.ikariam.gameforge.com/cdn/all/both/layout/scroll_bg.png);
+  padding: 0 16px;
+  white-space: nowrap;
+  font-size: 10px;
+  color: #50110a;
+  margin: 35px 0 0 -10px;
+
+  &.buildingSpeedup {
+    padding-right: 32px;
+
+    .buildingUpgradeIcon {
+      background: url(https://s402-en.ikariam.gameforge.com/cdn/all/both/icons/arrow_upgrade.png) no-repeat left 6px;
+      padding-left: 18px;
+    }
+
+    .buildingSpeedupButton {
+      width: 14px;
+      height: 14px;
+      background: url(https://s402-en.ikariam.gameforge.com/cdn/all/both/buttons/fast_fordward_14_normal.png) no-repeat center top;
+      right: 14px;
+      left: auto;
+      top: 4px;
+      position: absolute;
+      display: block;
+      cursor: pointer;
+    }
+  }
+
+
+  .after, .before {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px;
+    height: 23px;
+  }
+
+  .before {
+    background-image: url(https://s402-en.ikariam.gameforge.com/cdn/all/both/layout/scroll_leftend.png);
+    left: 0;
+  }
+
+  .after {
+    background-image: url(https://s402-en.ikariam.gameforge.com/cdn/all/both/layout/scroll_rightend.png);
+    right: 0;
+  }
+
+  .green {
+    color: #0eaa03;
+  }
+}
+
+.position0, .position9 {
+  z-index: 305;
+}
+
+.position1, .position2, .position15 {
+  z-index: 308;
+}
+
+.position3, .position4, .position7 {
+  z-index: 306;
+}
+
+.position5, .position6, .position18 {
+  z-index: 307;
+}
+
+.position8, .position10 {
+  z-index: 304;
+}
+
+.position11, .position13 {
+  z-index: 303;
+}
+
+.position12, .position14, .position16 {
+  z-index: 302;
+}
+
+.position17 {
+  z-index: 309;
+}
+
+.position19 {
+  z-index: 301;
+}
+
+.position20 {
+  z-index: 310;
+}
+
+.position21 {
+  z-index: 311;
+}
+
+.position22 {
+  z-index: 312;
+}
+
+.position23, .position24 {
+  z-index: 305;
+}
+
+.position0 {
+  left: 884px;
+  top: 462px;
+}
+
+.position1 {
+  left: 730px;
+  top: 738px;
+}
+
+.position2 {
+  left: 1085px;
+  top: 717px;
+}
+
+.position3 {
+  left: 1209px;
+  top: 535px;
+}
+
+.position4 {
+  left: 1010px;
+  top: 556px;
+}
+
+.position5 {
+  left: 851px;
+  top: 596px;
+}
+
+.position6 {
+  left: 649px;
+  top: 577px;
+}
+
+.position7 {
+  left: 491px;
+  top: 537px;
+}
+
+.position8 {
+  left: 490px;
+  top: 416px;
+}
+
+.position9 {
+  left: 650px;
+  top: 457px;
+}
+
+.position10 {
+  left: 1051px;
+  top: 418px;
+}
+
+.position11 {
+  left: 1207px;
+  top: 376px;
+}
+
+.position12 {
+  left: 908px;
+  top: 312px;
+}
+
+.position13 {
+  left: 770px;
+  top: 359px;
+}
+
+.position14 {
+  left: 452px;
+  top: 284px;
+}
+
+.position15 {
+  left: 528px;
+  top: 717px;
+}
+
+.position16 {
+  left: 1088px;
+  top: 319px;
+}
+
+.position17 {
+  left: 1088px;
+  top: 892px;
+}
+
+.position18 {
+  left: 1332px;
+  top: 585px;
+}
+
+.position19 {
+  left: 1320px;
+  top: 203px;
+}
+
+.position20 {
+  left: 1490px;
+  top: 636px;
+}
+
+.position21 {
+  left: 1442px;
+  top: 763px;
+}
+
+.position22 {
+  left: 1319px;
+  top: 699px;
+}
+
+.position23 {
+  left: 439px;
+  top: 634px;
+}
+
+.position24 {
+  left: 464px;
+  top: 969px;
+}
+
