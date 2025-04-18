@@ -70,3 +70,15 @@ func (s *ServiceImpl) InitCity(ctx context.Context, id uuid.UUID) (*City, error)
 func NewService(repository Repository) *ServiceImpl {
 	return &ServiceImpl{repository: repository}
 }
+
+type FakeService struct {
+	repo Repository
+}
+
+func (f *FakeService) InitCity(_ context.Context, id uuid.UUID) (*City, error) {
+	return &City{ID: id}, nil
+}
+
+func NewFakeService(repo Repository) *FakeService {
+	return &FakeService{repo: repo}
+}

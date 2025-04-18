@@ -1,10 +1,12 @@
 package city
 
 import (
+	"context"
+	"galvanico/internal/game/building"
 	"galvanico/internal/game/user"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -43,4 +45,44 @@ func (h *Handler) HandleGetUserCities(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(cities)
+}
+
+type FakeRepository struct {
+	data map[string]*City
+}
+
+func (f *FakeRepository) GetCitiesByUser(_ context.Context, userID uuid.UUID) ([]*City, error) {
+	var cityID = uuid.Must(uuid.NewRandom())
+	return []*City{
+		{
+			ID:        cityID,
+			Name:      "City",
+			PositionX: 1,
+			PositionY: 1,
+			UserCity: UserCity{
+				UserID: userID,
+				CityID: cityID,
+			},
+			Buildings: []Building{
+				{
+					CityID:   cityID,
+					Building: building.CityHall,
+					Level:    1,
+					Position: 0,
+				},
+			},
+			Resources: Resources{
+				CityID: cityID,
+			},
+		},
+	}, nil
+}
+
+func (f *FakeRepository) CreateCity(_ context.Context, _ *City) error {
+	// TODO implement me
+	panic("implement me")
+}
+
+func NewFakeRepository() Repository {
+	return &FakeRepository{data: make(map[string]*City)}
 }
