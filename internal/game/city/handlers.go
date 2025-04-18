@@ -4,6 +4,7 @@ import (
 	"context"
 	"galvanico/internal/game/building"
 	"galvanico/internal/game/user"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"

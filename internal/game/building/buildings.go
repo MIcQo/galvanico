@@ -2,7 +2,7 @@ package building
 
 import (
 	"fmt"
-	"golang.org/x/exp/slices"
+	"slices"
 	"strings"
 
 	"github.com/goccy/go-json"
@@ -11,11 +11,11 @@ import (
 type Building uint
 
 // String returns the string representation of a Building
-func (b Building) String() string {
-	if int(b) >= len(buildingNames) {
+func (b *Building) String() string {
+	if int(*b) >= len(buildingNames) {
 		return "unknown"
 	}
-	return buildingNames[b]
+	return buildingNames[*b]
 }
 
 func (b Building) MarshalJSON() ([]byte, error) {
