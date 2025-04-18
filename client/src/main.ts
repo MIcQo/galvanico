@@ -20,6 +20,14 @@ const app = createApp(App)
 app.use(i18n)
 app.use(createPinia())
 app.use(router)
-app.use(VueQueryPlugin)
+app.use(VueQueryPlugin, {
+  queryClientConfig: {
+    defaultOptions: {
+      queries: {
+        experimental_prefetchInRender: true,
+      }
+    }
+  }
+})
 
 app.mount('#app')

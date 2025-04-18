@@ -40,12 +40,12 @@ const linkOnMouseLeave = () => {
   <div class="building"
        :class="`position${props.position} ${props.building} ${props.upgrading ? 'constructionSite' : ''}`"
        :data-id="props.position">
-    <span class="buildingItem">
+    <div class="buildingItem">
       <div class="buildingimg img_pos animated"/>
       <div ref="link" class="hover img_pos"/>
       <a @mouseover="linkOnMouseOver" @mouseleave="linkOnMouseLeave" href="#"
          @click.prevent="openModal(props.building)" class="hoverable"></a>
-    </span>
+    </div>
   </div>
 
   <div v-if="props.upgrading" style="cursor:pointer;" class="buildingSpeedup timetofinish"
@@ -55,7 +55,8 @@ const linkOnMouseLeave = () => {
     <div class="buildingSpeedupButton" title="Skrátiť dobu výstavby"/>
     <div class="after"/>
   </div>
-  <div v-else style="cursor:pointer;" class="cityScroll timetofinish"
+  <div v-else-if="!props.upgrading && props.building != 'land'" style="cursor:pointer;"
+       class="cityScroll timetofinish"
        :class="`position${props.position}`">
     <div class="before"></div>
     <div class="green">{{ props.building }} (<span>{{ props.level || 1 }}</span>)</div>
