@@ -8,6 +8,13 @@
     .buildingimg, .hover {
       background-image: url(https://s402-en.ikariam.gameforge.com/cdn/all/both/img/city/baustelle_leer.png);
     }
+
+    .img_pos {
+      height: 140px;
+      left: -49px;
+      top: -60px;
+      width: 145px;
+    }
   }
 
   a {
@@ -19,14 +26,8 @@
     height: 60px;
     transform-origin: 50% 50%;
     -webkit-transform-origin: 50% 50%;
-    -moz-transform-origin: 50% 50%;
-    -ms-transform-origin: 50% 50%;
-    -o-transform-origin: 50% 50%;
     transform: rotate(28deg);
-    -webkit-transform: rotate(28deg);
-    -moz-transform: rotate(28deg);
     -ms-transform: rotate(28deg);
-    -o-transform: rotate(28deg);
   }
 
   .img_pos {
@@ -50,7 +51,27 @@
   }
 }
 
-.townhall {
+.land {
+  .img_pos {
+    bottom: -10px;
+    height: 78px;
+    left: -30px;
+    width: 129px;
+  }
+
+  .buildingimg, .hover {
+    background-image: url(https://s402-en.ikariam.gameforge.com/cdn/all/both/img/city/baustelle_land_rot.png);
+  }
+
+  a {
+    height: 50px;
+    width: 100px;
+    left: -20px;
+    bottom: -5px;
+  }
+}
+
+.townhall, .city_hall {
   .img_pos {
     left: -22px;
     top: -71px;

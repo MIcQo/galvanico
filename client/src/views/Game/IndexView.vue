@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref} from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
 import Building from "@/components/City/Building.vue";
 import {useModal} from "@/stores/modal.ts";
+import {useCurrentCity} from "@/stores/user.ts";
+import {storeToRefs} from "pinia";
 
 const worldview = ref<HTMLElement | null>(null);
 const worldmap = ref<HTMLElement | null>(null);
@@ -70,7 +72,7 @@ const handleMouseDown = (e: MouseEvent): void => {
   startX = e.clientX;
   startY = e.clientY;
 }
-const handleMouseUp = (e: MouseEvent): void => {
+const handleMouseUp = (): void => {
   isDragging = false;
 }
 const handleMouseMove = (e: MouseEvent): void => {
@@ -90,7 +92,7 @@ const handleMouseMove = (e: MouseEvent): void => {
   updateMapOffset()
 }
 
-const resizeHandler = (e): void => {
+const resizeHandler = (e: Event): void => {
   if (!worldview.value || !e.target) {
     return;
   }
@@ -98,8 +100,9 @@ const resizeHandler = (e): void => {
   viewportWidth = window.innerWidth;
   viewportHeight = window.innerHeight;
 
-  worldview.value.style.width = e.target.innerWidth + 'px';
-  worldview.value.style.height = e.target.innerHeight + 'px';
+  const w = e.target as Window;
+  worldview.value.style.width = w.innerWidth + 'px';
+  worldview.value.style.height = w.innerHeight + 'px';
 }
 
 const clampPosition = () => {
@@ -174,10 +177,28 @@ onUnmounted(() => {
   window.removeEventListener("resize", resizeHandler);
 })
 
+const {currentCity} = storeToRefs(useCurrentCity());
+let emptyPositions = computed(() => {
+  if (!currentCity.value) return [];
+  const occupied = currentCity.value.Buildings.map(value => value.Position)
+  const empty: number[] = [];
+
+  for (let i = 0; i <= 24; i++) {
+    if (occupied?.indexOf(i) !== -1) {
+      continue;
+    }
+
+    empty.push(i)
+  }
+
+  return empty;
+})
+
 </script>
 
 <template>
   <div>
+    <span>{{ currentCity }}</span>
     <div ref="worldview" class="worldview">
       <div class="scollcover">
         <div ref="worldmap" class="worldmap">
@@ -188,10 +209,9 @@ onUnmounted(() => {
             <div id="city_background_sw" class="city_background"></div>
             <div id="city_background_se" class="city_background"></div>
 
-            <Building building="townhall" :position="0"/>
-            <Building v-for="n in 23" building="warehouse" :position="n" :upgrading="n % 2==1"/>
-            <Building building="something" :position="24"/>
-
+            <Building v-for="cb of currentCity?.Buildings" :building="cb.Building.toString()"
+                      :position="cb.Position"/>
+            <building v-for="e in emptyPositions" building="land" :position="e"/>
           </div>
           <div class="city_water_bottom"></div>
         </div>
