@@ -169,7 +169,7 @@ func registerAuthorizedRoutes(app fiber.Router, cfg *config.Config) {
 	var publisher = broker.NewNatsPublisher(broker.Connection())
 	var userService = user.NewService(userRepo, publisher)
 	var userHandler = user.NewHandler(userRepo, userService, cfg)
-	var cityHandler = city.NewHandler(cityRepo, city.NewService(), userService)
+	var cityHandler = city.NewHandler(cityRepo, city.NewService(cityRepo), userService)
 
 	var api = app.Group("/api")
 	{
@@ -183,10 +183,10 @@ func registerAuthorizedRoutes(app fiber.Router, cfg *config.Config) {
 			usr.Get("", userHandler.GetHandler)
 			usr.Patch("/username", userHandler.ChangeUsernameHandler)
 			usr.Patch("/password", userHandler.ChangePasswordHandler)
-		}
-		var ct = api.Group("/city")
-		{
-			ct.Get("", cityHandler.HandleGetUserCities)
+			var ct = usr.Group("/city")
+			{
+				ct.Get("", cityHandler.HandleGetUserCities)
+			}
 		}
 	}
 }
