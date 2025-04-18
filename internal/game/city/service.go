@@ -4,8 +4,9 @@ import (
 	"context"
 	"galvanico/internal/game/building"
 	"galvanico/internal/utils"
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Service interface {
@@ -17,7 +18,7 @@ type ServiceImpl struct {
 }
 
 func (s *ServiceImpl) randomCoordinate() (int64, error) {
-	return utils.RandomNumber(0, 100)
+	return utils.RandomNumber(MinPosition, MaxPosition)
 }
 
 func (s *ServiceImpl) InitCity(ctx context.Context, id uuid.UUID) (*City, error) {
@@ -34,7 +35,7 @@ func (s *ServiceImpl) InitCity(ctx context.Context, id uuid.UUID) (*City, error)
 	var cityID = uuid.Must(uuid.NewRandom())
 	var city = &City{
 		ID:        cityID,
-		Name:      "City",
+		Name:      DefaultCityName,
 		PositionX: randomX,
 		PositionY: randomY,
 		UserCity: UserCity{
@@ -45,16 +46,16 @@ func (s *ServiceImpl) InitCity(ctx context.Context, id uuid.UUID) (*City, error)
 			{
 				CityID:   cityID,
 				Building: building.CityHall,
-				Level:    1,
-				Position: 0,
+				Level:    DefaultTownHallLevel,
+				Position: DefaultTownHallPosition,
 			},
 		},
 		Resources: Resources{
 			CityID:            cityID,
-			Wood:              1000,
-			WarehouseCapacity: 2500,
-			Population:        40,
-			MaxPopulation:     100,
+			Wood:              DefaultWood,
+			WarehouseCapacity: DefaultWarehouseCapacity,
+			Population:        DefaultPopulation,
+			MaxPopulation:     DefaultMaxPopulation,
 			UpdatedAt:         time.Now(),
 		},
 	}

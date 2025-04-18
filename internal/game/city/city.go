@@ -2,10 +2,24 @@ package city
 
 import (
 	"galvanico/internal/game/building"
-	"github.com/uptrace/bun"
 	"time"
 
+	"github.com/uptrace/bun"
+
 	"github.com/google/uuid"
+)
+
+const (
+	DefaultCityName          = "City"
+	DefaultTownHallLevel     = 1
+	DefaultTownHallPosition  = 0
+	DefaultWood              = 1000
+	DefaultWarehouseCapacity = 2500
+	DefaultPopulation        = 40
+	DefaultMaxPopulation     = 100
+
+	MinPosition = 0
+	MaxPosition = 100
 )
 
 type City struct {

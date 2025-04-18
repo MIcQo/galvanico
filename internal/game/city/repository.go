@@ -2,6 +2,7 @@ package city
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )

@@ -5,16 +5,17 @@ import (
 	"galvanico/internal/auth"
 	"galvanico/internal/config"
 	"galvanico/internal/game/user"
+	"io"
+	"net/http"
+	"testing"
+	"time"
+
 	"github.com/goccy/go-json"
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
-	"io"
-	"net/http"
-	"testing"
-	"time"
 )
 
 const signingKey = "AToAQz1ZtiDFPd6S5O4lyPCixPpo5I58"
