@@ -28,7 +28,7 @@ watch(userCities, (newCities) => {
 </script>
 
 <template>
-  <div class="leftbox w-3/6 h-32 bg-base-200 absolute top-[40px] left-0 z-400">
+  <div class="leftbox w-3/6 h-32 bg-base-200 absolute top-[40px] left-0 z-[400]">
     <select
       @change="handleCityChange"
       aria-label="Select city"
