@@ -79,9 +79,10 @@ func (f *FakeRepository) GetCitiesByUser(_ context.Context, userID uuid.UUID) ([
 	}, nil
 }
 
-func (f *FakeRepository) CreateCity(_ context.Context, _ *City) error {
-	// TODO implement me
-	panic("implement me")
+func (f *FakeRepository) CreateCity(_ context.Context, city *City) error {
+	cityID := city.ID.String()
+	f.data[cityID] = city
+	return nil
 }
 
 func NewFakeRepository() Repository {

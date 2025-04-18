@@ -24,6 +24,9 @@ app.use(VueQueryPlugin, {
   queryClientConfig: {
     defaultOptions: {
       queries: {
+        // Enable experimental prefetch-in-render to prefetch critical data
+        // during component render. See:
+        // https://tanstack.com/query/latest/docs/vue/guides/prefetching
         experimental_prefetchInRender: true,
       }
     }

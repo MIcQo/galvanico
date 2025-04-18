@@ -7,8 +7,11 @@ import (
 	"github.com/uptrace/bun"
 )
 
+// Repository provides methods for working with City data
 type Repository interface {
+	// GetCitiesByUser retrieves all cities associated with a given user ID.
 	GetCitiesByUser(ctx context.Context, userID uuid.UUID) ([]*City, error)
+	// CreateCity persists a new city with all its related entities.
 	CreateCity(ctx context.Context, city *City) error
 }
 
@@ -35,24 +38,29 @@ func (r *RepositoryImpl) GetCitiesByUser(ctx context.Context, userID uuid.UUID) 
 }
 
 func (r *RepositoryImpl) CreateCity(ctx context.Context, city *City) error {
-	var _, cityErr = r.db.NewInsert().Model(city).Exec(ctx)
+	var tx, err = r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	var _, cityErr = tx.NewInsert().Model(city).Exec(ctx)
 	if cityErr != nil {
 		return cityErr
 	}
 
-	var _, buildingsErr = r.db.NewInsert().Model(&city.Buildings).Exec(ctx)
+	var _, buildingsErr = tx.NewInsert().Model(&city.Buildings).Exec(ctx)
 	if buildingsErr != nil {
 		return buildingsErr
 	}
 
-	var _, resourcesErr = r.db.NewInsert().Model(&city.Resources).Exec(ctx)
+	var _, resourcesErr = tx.NewInsert().Model(&city.Resources).Exec(ctx)
 	if resourcesErr != nil {
 		return resourcesErr
 	}
-	var _, userErr = r.db.NewInsert().Model(&city.UserCity).Exec(ctx)
+	var _, userErr = tx.NewInsert().Model(&city.UserCity).Exec(ctx)
 	if userErr != nil {
 		return userErr
 	}
 
-	return nil
+	return tx.Commit()
 }

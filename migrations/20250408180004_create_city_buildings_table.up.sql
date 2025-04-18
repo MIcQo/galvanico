@@ -9,7 +9,7 @@ CREATE TABLE city_buildings
 );
 
 ALTER TABLE "city_buildings"
-    ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
+    ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON DELETE CASCADE;
 
 insert into city_buildings (city_id, building, level, position)
 values ('715929a9-416a-4a7f-8711-a7cbb781e2dd', 0, 1, 0);

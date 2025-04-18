@@ -11,9 +11,7 @@ export interface User {
 }
 
 export function getCurrentUser() {
-  const {data: currentUser} = useQuery({queryKey: ['currentUser'], queryFn: fetchCurrentUser})
-
-  return {currentUser}
+  return useQuery({queryKey: ['currentUser'], queryFn: fetchCurrentUser})
 }
 
 async function fetchCurrentUser(): Promise<UserResponse> {

@@ -8,8 +8,6 @@ export const useModal = defineStore('modal', () => {
     function open(building: string): void {
         isOpen.value = true
         buildingContext.value = building;
-
-        console.log(isOpen, buildingContext)
     }
 
     function close(): void {

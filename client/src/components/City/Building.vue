@@ -16,21 +16,18 @@ const props = defineProps({
 })
 
 const modal = useModal();
-const link = ref<HTMLElement>();
+const linkOpacity = ref(0);
 
 const openModal = (building: string) => {
   modal.open(building)
 }
 
 const linkOnMouseOver = () => {
-  const l = link.value as HTMLElement;
+  linkOpacity.value = 1;
 
-  l.style.opacity = "1";
 }
 const linkOnMouseLeave = () => {
-  const l = link.value as HTMLElement;
-
-  l.style.opacity = "0";
+  linkOpacity.value = 0;
 }
 
 </script>
@@ -42,7 +39,7 @@ const linkOnMouseLeave = () => {
        :data-id="props.position">
     <div class="buildingItem">
       <div class="buildingimg img_pos animated"/>
-      <div ref="link" class="hover img_pos"/>
+      <div :style="{opacity: linkOpacity}" class="hover img_pos"/>
       <a @mouseover="linkOnMouseOver" @mouseleave="linkOnMouseLeave" href="#"
          @click.prevent="openModal(props.building)" class="hoverable"></a>
     </div>

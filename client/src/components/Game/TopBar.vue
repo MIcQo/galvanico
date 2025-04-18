@@ -1,28 +1,19 @@
 <script setup lang="ts">
-import {useRouter} from "vue-router";
-import {useAlert} from "@/stores/alert.ts";
-import {useI18n} from "vue-i18n";
-import {removeToken} from "@/services/auth.ts";
 import {IconBrandGithub} from '@tabler/icons-vue';
 import {useCurrentUser} from "@/stores/user.ts";
 import {storeToRefs} from "pinia";
+import {useLogout} from "@/composables/logout.ts";
 
-const router = useRouter();
-const alert = useAlert();
-const {t} = useI18n();
 const {currentUser} = storeToRefs(useCurrentUser());
 
-const logout = () => {
-  removeToken()
-  alert.open(t("auth.alert.logout"));
-  router.push({name: "auth.login"})
-}
+const {logout} = useLogout();
 
 </script>
 
 <template>
   <div class="container mx-auto">
-    <div class="absolute top-[10px] right-2"><a href="#">
+    <div class="absolute top-[10px] right-2"><a href="https://github.com/MIcQo/galvanico"
+                                                target="_blank">
       <IconBrandGithub stroke="2"/>
     </a></div>
     <div class="topbox w-full bg-base-100 h-[40px] flex justify-center items-center px-12 text-xs">

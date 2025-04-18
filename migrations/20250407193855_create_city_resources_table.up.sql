@@ -13,7 +13,7 @@ CREATE TABLE "city_resources"
 );
 
 ALTER TABLE "city_resources"
-    ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
+    ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON DELETE CASCADE;
 
 INSERT INTO city_resources (city_id)
 values ('715929a9-416a-4a7f-8711-a7cbb781e2dd');

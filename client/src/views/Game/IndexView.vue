@@ -106,27 +106,11 @@ const resizeHandler = (e: Event): void => {
 }
 
 const clampPosition = () => {
-
-  // const viewportLeft = (mapLeft + viewportWidth) *-1;
-  //
-  // if (viewportLeft >= (mapWidth/2)) {
-  //   mapLeft = (mapWidth - viewportWidth) * -1;
-  // }
-  //
-  // console.log("viewport left", viewportLeft, mapLeft, mapWidth/2);
-
-
   const scaledWidth = mapWidth;
   const scaledHeight = mapHeight * scale;
 
   const minX = viewportWidth - scaledWidth;
   const minY = viewportHeight - scaledHeight;
-
-  console.log("scaled", scaledWidth, scaledHeight);
-  console.log("viewport", viewportWidth, viewportHeight);
-  console.log("min", minX, minY);
-  console.log("left", Math.max(minX, mapLeft))
-  console.log("top", Math.max(minY, mapTop))
 
   mapLeft = Math.min(0, Math.max(minX, mapLeft));
   mapTop = Math.min(0, Math.max(minY, mapTop));
@@ -140,7 +124,6 @@ const updateMapOffset = (): void => {
   worldmap.value.style.top = `${mapTop}px`
   worldmap.value.style.left = `${mapLeft}px`
   worldmap.value.style.transform = `scale(${scale})`
-  console.log(worldmap.value.offsetTop, worldmap.value.clientTop, worldmap.value.scrollTop);
 }
 
 onMounted(() => {
@@ -151,13 +134,12 @@ onMounted(() => {
   }
 
   if (worldmap.value) {
-    // mapLeft = (viewportWidth - (mapWidth)) / 2;
-    // mapTop = (viewportHeight-(mapHeight)) / 2;
+    // center map on mount
     mapTop = 0
     mapLeft = (viewportWidth - mapWidth) / 2;
     updateMapOffset()
 
-    worldmap.value.addEventListener('wheel', handleScroll);
+    worldmap.value.addEventListener('wheel', handleScroll, {passive: false});
   }
 
   window.addEventListener('mouseup', handleMouseUp);
@@ -171,9 +153,9 @@ onUnmounted(() => {
   }
   if (worldview.value) {
     worldview.value.removeEventListener('mousedown', handleMouseDown);
-    worldview.value.removeEventListener('mousemove', handleMouseMove);
   }
   window.removeEventListener('mouseup', handleMouseUp);
+  window.removeEventListener('mousemove', handleMouseMove);
   window.removeEventListener("resize", resizeHandler);
 })
 

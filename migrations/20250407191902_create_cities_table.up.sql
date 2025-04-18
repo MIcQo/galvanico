@@ -4,7 +4,8 @@ CREATE TABLE "cities"
     "name"     string           NOT NULL,
     position_x int              not null,
     position_y int              not null,
-    created_at timestamp        not null default current_timestamp
+    created_at timestamp not null default current_timestamp,
+    INDEX city_position_idx (position_x, position_y)
 );
 
 INSERT INTO cities (id, name, position_x, position_y)

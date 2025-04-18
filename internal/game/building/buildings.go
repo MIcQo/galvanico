@@ -2,7 +2,6 @@ package building
 
 import (
 	"fmt"
-	"slices"
 	"strings"
 
 	"github.com/goccy/go-json"
@@ -23,20 +22,17 @@ func (b Building) MarshalJSON() ([]byte, error) {
 }
 
 func (b *Building) UnmarshalJSON(data []byte) error {
-	var needle string
-	err := json.Unmarshal(data, &needle)
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	building, err := FromString(s)
 	if err != nil {
 		return err
 	}
 
-	var index = slices.Index(buildingNames, needle)
-
-	if index == -1 {
-		return fmt.Errorf("%s is not valid building", needle)
-	}
-
-	*b = Building(index)
-
+	*b = building
 	return nil
 }
 
