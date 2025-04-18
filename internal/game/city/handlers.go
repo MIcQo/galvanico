@@ -33,5 +33,14 @@ func (h *Handler) HandleGetUserCities(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
+	if len(cities) == 0 {
+		var city, cityErr = h.service.InitCity(c.Context(), usr.ID)
+		if cityErr != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, cityErr.Error())
+		}
+
+		cities = append(cities, city)
+	}
+
 	return c.JSON(cities)
 }
