@@ -3,6 +3,10 @@ import {defaultInstance} from "@/services/api.ts";
 
 enum Building {
   city_hall
+  // TODO: Add other building types like:
+  // warehouse,
+  // barracks,
+  // etc.
 }
 
 export interface CityBuilding {

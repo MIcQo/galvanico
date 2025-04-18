@@ -4,15 +4,17 @@ import {type UserCitiesResponse} from "@/query/userCity.ts";
 import {ref} from "vue";
 
 export const useCurrentUser = defineStore('currentUser', () => {
-  const {currentUser} = getCurrentUser()
+  const {data: currentUser, isLoading, error} = getCurrentUser()
 
   return {
     currentUser,
+    isLoading,
+    error
   }
 })
 
 export const useCurrentCity = defineStore('currentCity', () => {
-  let currentCity = ref<UserCitiesResponse>()
+  const currentCity = ref<UserCitiesResponse>()
 
   const setCurrentCity = (city: UserCitiesResponse) => {
     currentCity.value = city;

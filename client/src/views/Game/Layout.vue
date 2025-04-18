@@ -18,7 +18,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="container" class="w-scree h-screen">
+  <div id="container" class="w-screen h-screen">
     <TopBar/>
     <Menu/>
     <Advisors/>
