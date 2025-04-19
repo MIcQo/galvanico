@@ -3,16 +3,37 @@ package building
 import (
 	"fmt"
 	"strings"
+
+	"github.com/goccy/go-json"
 )
 
 type Building uint
 
 // String returns the string representation of a Building
-func (b Building) String() string {
-	if int(b) >= len(buildingNames) {
+func (b *Building) String() string {
+	if int(*b) >= len(buildingNames) {
 		return "unknown"
 	}
-	return buildingNames[b]
+	return buildingNames[*b]
+}
+
+func (b Building) MarshalJSON() ([]byte, error) {
+	return json.Marshal(b.String())
+}
+
+func (b *Building) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	building, err := FromString(s)
+	if err != nil {
+		return err
+	}
+
+	*b = building
+	return nil
 }
 
 const (
