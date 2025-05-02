@@ -35,7 +35,7 @@
     "@vue/eslint-config-typescript": "14.5.0",
     "@vue/test-utils": "2.4.6",
     "@vue/tsconfig": "0.7.0",
-    "daisyui": "5.0.27",
+    "daisyui": "5.0.35",
     "eslint": "9.25.1",
     "eslint-plugin-playwright": "2.2.0",
     "eslint-plugin-vue": "10.0.0",
