@@ -1,6 +1,6 @@
 # use the official Bun image
 # see all versions at https://hub.docker.com/r/oven/bun/tags
-FROM oven/bun:1@sha256:420d7f4b99caadf1727ced361ae9455fbd175d54e3ec7ed698901fbf67cb2b1f AS base
+FROM oven/bun:1@sha256:66b431441dc4c36d7e8164bfc61e6348ec1d7ce2862fc3a29f5dc9856e8205e4 AS base
 WORKDIR /usr/src/app
 
 FROM base AS install
