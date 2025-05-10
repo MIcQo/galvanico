@@ -1,6 +1,6 @@
 # use the official Bun image
 # see all versions at https://hub.docker.com/r/oven/bun/tags
-FROM oven/bun:1@sha256:6b75f9df71c53160c42a517efa70904ec39ba0eefd09c6c715d86facc9db33e2 AS base
+FROM oven/bun:1@sha256:a02c6162266611419fd84c8f96dbdbf3029532e2491314dee5172a27223e5428 AS base
 WORKDIR /usr/src/app
 
 FROM base AS install
@@ -21,7 +21,7 @@ ENV NODE_ENV=production
 ENV VITE_BACKEND_URL=/
 RUN bun run build-only
 
-FROM golang:1.24@sha256:30baaea08c5d1e858329c50f29fe381e9b7d7bced11a0f5f1f69a1504cdfbf5e AS builder
+FROM golang:1.24@sha256:39d9e7d9c5d9c9e4baf0d8fff579f06d5032c0f4425cdec9e86732e8e4e374dc AS builder
 WORKDIR /go/src/app
 COPY . .
 COPY --from=prerelease /temp/prod/dist public
