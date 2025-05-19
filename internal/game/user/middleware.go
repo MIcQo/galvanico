@@ -38,7 +38,14 @@ func (m *Middleware) CheckNotBanned() fiber.Handler {
 			})
 		}
 
-		user, err := m.repo.GetByID(c.Context(), uuid.MustParse(userID))
+		parsedID, err := uuid.Parse(userID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid user ID format",
+			})
+		}
+
+		user, err := m.repo.GetByID(c.Context(), parsedID)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": "User not found",

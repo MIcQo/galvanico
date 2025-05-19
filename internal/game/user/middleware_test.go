@@ -25,6 +25,25 @@ func generateTestToken(userID uuid.UUID, secret string) string {
 	return s
 }
 
+func generateInvalidIDTestToken(secret string) string {
+	claims := jwt.MapClaims{
+		"sub": "invalid",
+		"exp": time.Now().Add(time.Hour).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	s, _ := token.SignedString([]byte(secret))
+	return s
+}
+
+func generateWithoutSubAttrToken(secret string) string {
+	claims := jwt.MapClaims{
+		"exp": time.Now().Add(time.Hour).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	s, _ := token.SignedString([]byte(secret))
+	return s
+}
+
 func setupAppWithMiddleware(secret string, middleware *Middleware) *fiber.App {
 	app := fiber.New()
 
@@ -98,5 +117,29 @@ func TestMiddleware_WithStruct(t *testing.T) {
 		resp, err := app.Test(req)
 		require.NoError(t, err)
 		assert.Equal(t, 404, resp.StatusCode)
+	})
+
+	t.Run("Invalid ID instead of UUID", func(t *testing.T) {
+		app := setupAppWithMiddleware(secret, middleware)
+		token := generateInvalidIDTestToken(secret)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set("Authorization", "Bearer "+token)
+
+		resp, err := app.Test(req)
+		require.NoError(t, err)
+		assert.Equal(t, 400, resp.StatusCode)
+	})
+
+	t.Run("No sub in token", func(t *testing.T) {
+		app := setupAppWithMiddleware(secret, middleware)
+		token := generateWithoutSubAttrToken(secret)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set("Authorization", "Bearer "+token)
+
+		resp, err := app.Test(req)
+		require.NoError(t, err)
+		assert.Equal(t, 400, resp.StatusCode)
 	})
 }
