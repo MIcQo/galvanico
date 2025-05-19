@@ -10,6 +10,10 @@ import (
 	"github.com/google/uuid"
 )
 
+const PortSlot1 = 4
+const PortSlot2 = 5
+const DefenseSlot1 = 8
+
 type Handler struct {
 	repository  Repository
 	service     Service
@@ -77,10 +81,10 @@ func (h *Handler) HandleAvailableSlotBuildings(c *fiber.Ctx) error {
 
 	var buildings []building.Building
 	switch slot {
-	case 4, 5:
+	case PortSlot1, PortSlot2:
 		buildings = building.GetPortBuildings()
 
-	case 8:
+	case DefenseSlot1:
 		buildings = building.GetDefenseBuildings()
 	default:
 		buildings = building.GetStandardBuildings()

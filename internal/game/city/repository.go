@@ -98,8 +98,8 @@ func (f *FakeRepository) CreateCity(_ context.Context, city *City) error {
 	return nil
 }
 
-func (r *FakeRepository) GetCityByID(_ context.Context, id uuid.UUID) (*City, error) {
-	for _, cities := range r.data {
+func (f *FakeRepository) GetCityByID(_ context.Context, id uuid.UUID) (*City, error) {
+	for _, cities := range f.data {
 		for _, city := range cities {
 			if city.ID.String() == id.String() {
 				return city, nil
@@ -158,7 +158,7 @@ func NewFakeRepository() Repository {
 						CityID:   secondCityID,
 						Building: building.IndustrialPort,
 						Level:    1,
-						Position: 5,
+						Position: PortSlot2,
 					},
 					{
 						CityID:   secondCityID,
