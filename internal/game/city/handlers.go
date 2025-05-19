@@ -1,9 +1,9 @@
 package city
 
 import (
-	"context"
 	"galvanico/internal/game/building"
 	"galvanico/internal/game/user"
+	"galvanico/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -48,43 +48,46 @@ func (h *Handler) HandleGetUserCities(c *fiber.Ctx) error {
 	return c.JSON(cities)
 }
 
-type FakeRepository struct {
-	data map[string]*City
-}
+func (h *Handler) HandleAvailableSlotBuildings(c *fiber.Ctx) error {
+	var token, ok = c.Locals("user").(*jwt.Token)
+	if !ok {
+		return fiber.ErrUnauthorized
+	}
 
-func (f *FakeRepository) GetCitiesByUser(_ context.Context, userID uuid.UUID) ([]*City, error) {
-	var cityID = uuid.Must(uuid.NewRandom())
-	return []*City{
-		{
-			ID:        cityID,
-			Name:      "City",
-			PositionX: 1,
-			PositionY: 1,
-			UserCity: UserCity{
-				UserID: userID,
-				CityID: cityID,
-			},
-			Buildings: []Building{
-				{
-					CityID:   cityID,
-					Building: building.CityHall,
-					Level:    1,
-					Position: 0,
-				},
-			},
-			Resources: Resources{
-				CityID: cityID,
-			},
-		},
-	}, nil
-}
+	var cityID = c.Params("city", "")
+	var slot, err = c.ParamsInt("slot", 0)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
 
-func (f *FakeRepository) CreateCity(_ context.Context, city *City) error {
-	cityID := city.ID.String()
-	f.data[cityID] = city
-	return nil
-}
+	var _, usrErr = h.userService.GetUser(c.Context(), token)
+	if usrErr != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, usrErr.Error())
+	}
 
-func NewFakeRepository() Repository {
-	return &FakeRepository{data: make(map[string]*City)}
+	var city, cityErr = h.repository.GetCityByID(c.Context(), uuid.MustParse(cityID))
+	if cityErr != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, cityErr.Error())
+	}
+
+	var alreadyBuilt []building.Building
+	for _, b := range city.Buildings {
+		alreadyBuilt = append(alreadyBuilt, b.Building)
+	}
+
+	var buildings []building.Building
+	switch slot {
+	case 4, 5:
+		buildings = building.GetPortBuildings()
+
+	case 8:
+		buildings = building.GetDefenseBuildings()
+	default:
+		buildings = building.GetStandardBuildings()
+	}
+
+	return c.JSON(fiber.Map{
+		"slot":      slot,
+		"buildings": utils.FilterNotIn(buildings, alreadyBuilt),
+	})
 }

@@ -107,3 +107,45 @@ var buildingNames = []string{
 	"chemical_plant",
 	"explosives_testing_site",
 }
+
+func GetStandardBuildings() []Building {
+	return []Building{
+		GovernmentPalace,
+		ColonialOffice,
+		PublicHouse,
+		NaturalHistoryMuseum,
+		University,
+		Factory,
+		Cathedral,
+		ForeignMinistry,
+		IndustrialWarehouse,
+		Landfill,
+		StockExchange,
+		IntelligenceBureau,
+		MilitaryBarracks,
+		PrivateerBase,
+		ForestryOffice,
+		Sawmill,
+		Winery,
+		WineDistillery,
+		StoneQuarry,
+		ArchitecturalBureau,
+		GlassFactory,
+		OpticalLaboratory,
+		ChemicalPlant,
+		ExplosivesTestingSite,
+	}
+}
+
+func GetDefenseBuildings() []Building {
+	return []Building{
+		FortifiedCityWall,
+	}
+}
+
+func GetPortBuildings() []Building {
+	return []Building{
+		IndustrialPort,
+		NavalDockyard,
+	}
+}

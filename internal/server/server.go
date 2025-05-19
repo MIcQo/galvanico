@@ -186,6 +186,11 @@ func registerAuthorizedRoutes(app fiber.Router, cfg *config.Config) {
 			var ct = usr.Group("/city")
 			{
 				ct.Get("", cityHandler.HandleGetUserCities)
+
+				var cg = ct.Group("/:city")
+				{
+					cg.Get("/building/:slot/available", cityHandler.HandleAvailableSlotBuildings)
+				}
 			}
 		}
 	}
