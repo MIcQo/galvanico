@@ -59,19 +59,28 @@ func (h *Handler) HandleAvailableSlotBuildings(c *fiber.Ctx) error {
 	}
 
 	var cityID = c.Params("city", "")
+	if cityID == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "city ID is required")
+	}
+
 	var slot, err = c.ParamsInt("slot", 0)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	var _, usrErr = h.userService.GetUser(c.Context(), token)
-	if usrErr != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, usrErr.Error())
+	// Validate slot number is within valid range (assuming valid slots are 1-10)
+	if slot < 1 || slot > 10 {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid slot number")
 	}
 
 	var city, cityErr = h.repository.GetCityByID(c.Context(), uuid.MustParse(cityID))
 	if cityErr != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, cityErr.Error())
+	}
+
+	var usr, _ = h.userService.GetUser(c.Context(), token)
+	if city.UserCity.UserID != usr.ID {
+		return fiber.ErrForbidden
 	}
 
 	var alreadyBuilt []building.Building
@@ -80,6 +89,7 @@ func (h *Handler) HandleAvailableSlotBuildings(c *fiber.Ctx) error {
 	}
 
 	var buildings []building.Building
+
 	switch slot {
 	case PortSlot1, PortSlot2:
 		buildings = building.GetPortBuildings()
