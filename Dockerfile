@@ -30,7 +30,7 @@ RUN CGO_ENABLED=0 go build -o /go/bin/app
 
 FROM busybox:uclibc@sha256:ed0455a0f719c9f203d2ec745682ed78854395fe419bfac8b6ea2ee2e9413409 AS busybox
 
-FROM gcr.io/distroless/base@sha256:27769871031f67460f1545a52dfacead6d18a9f197db77110cfc649ca2a91f44
+FROM gcr.io/distroless/base@sha256:cef75d12148305c54ef5769e6511a5ac3c820f39bf5c8a4fbfd5b76b4b8da843
 WORKDIR /go
 COPY --from=busybox /bin/ls /bin/ls
 COPY --from=busybox /bin/sh /bin/sh
