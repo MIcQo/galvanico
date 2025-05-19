@@ -170,6 +170,7 @@ func registerAuthorizedRoutes(app fiber.Router, cfg *config.Config) {
 	var userService = user.NewService(userRepo, publisher)
 	var userHandler = user.NewHandler(userRepo, userService, cfg)
 	var cityHandler = city.NewHandler(cityRepo, city.NewService(cityRepo), userService)
+	var userMiddleware = user.NewUserMiddleware(userRepo)
 
 	var api = app.Group("/api")
 	{
@@ -177,6 +178,8 @@ func registerAuthorizedRoutes(app fiber.Router, cfg *config.Config) {
 			ErrorHandler: auth.ErrorHandler,
 			SigningKey:   jwtware.SigningKey{Key: key},
 		}))
+
+		api.Use(userMiddleware.CheckNotBanned())
 
 		var usr = api.Group("/user")
 		{
