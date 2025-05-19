@@ -22,6 +22,7 @@ import (
 
 var signingKey = utils.RandomString(32)
 var testUserID = uuid.MustParse("9efa2461-e40a-423a-a734-ce29f302437b")
+var bannedUserID = uuid.MustParse("0c06a637-73cb-4234-a1db-77034215bc6f")
 
 func setup() (*fiber.App, *Handler) {
 	var pass, err = bcrypt.GenerateFromPassword([]byte("test"), bcrypt.DefaultCost)
@@ -43,7 +44,7 @@ func setup() (*fiber.App, *Handler) {
 		"banned": {
 			Username:      "banned",
 			Password:      sql.NullString{Valid: true, String: string(pass)},
-			ID:            uuid.Must(uuid.NewRandom()),
+			ID:            bannedUserID,
 			BanExpiration: sql.NullTime{Time: banTime, Valid: true},
 			BanReason:     sql.NullString{Valid: true, String: "banned"},
 		},
@@ -118,6 +119,16 @@ func TestHandler_HandleGetUserCities(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, fiber.StatusUnauthorized, res.StatusCode)
+	})
+
+	t.Run("should forbid banned user", func(t *testing.T) {
+		req, _ := http.NewRequest(http.MethodGet, "/", nil)
+		token, err := auth.GenerateJWT(cfg, bannedUserID)
+		require.NoError(t, err)
+		req.Header.Set("Authorization", "Bearer "+token)
+		res, err := app.Test(req, -1)
+		require.NoError(t, err)
+		require.Equal(t, fiber.StatusForbidden, res.StatusCode)
 	})
 }
 

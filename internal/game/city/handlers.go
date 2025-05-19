@@ -32,7 +32,11 @@ func (h *Handler) HandleGetUserCities(c *fiber.Ctx) error {
 
 	var usr, usrErr = h.userService.GetUser(c.Context(), token)
 	if usrErr != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, usrErr.Error())
+		return fiber.NewError(fiber.StatusForbidden, usrErr.Error())
+	}
+
+	if usr.BanExpiration.Valid {
+		return fiber.NewError(fiber.StatusForbidden, "User banned")
 	}
 
 	var cities, err = h.repository.GetCitiesByUser(c.Context(), usr.ID)
