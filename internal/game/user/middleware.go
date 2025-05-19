@@ -1,6 +1,8 @@
 package user
 
 import (
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -52,7 +54,7 @@ func (m *Middleware) CheckNotBanned() fiber.Handler {
 			})
 		}
 
-		if user.BanExpiration.Valid {
+		if user.BanExpiration.Valid && user.BanExpiration.Time.After(time.Now()) {
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 				"error": "User is banned",
 			})
