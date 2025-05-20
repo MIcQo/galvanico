@@ -19,7 +19,7 @@ func (f fakePublisher) Publish(_ string, _ []byte) error {
 }
 
 func TestServiceIml_Register(t *testing.T) {
-	var svc = NewService(&fakerUserRepository{data: map[string]*User{
+	var svc = NewService(&FakerUserRepository{data: map[string]*User{
 		"test": {
 			ID:       uuid.MustParse("ebfc76b7-7ace-4034-a8b6-cc369afa8fb8"),
 			Username: "test",
@@ -54,7 +54,7 @@ func TestServiceIml_Register(t *testing.T) {
 }
 
 func TestServiceIml_GetUser(t *testing.T) {
-	var svc = NewService(&fakerUserRepository{data: map[string]*User{
+	var svc = NewService(&FakerUserRepository{data: map[string]*User{
 		"test": {
 			ID:       uuid.MustParse("ebfc76b7-7ace-4034-a8b6-cc369afa8fb8"),
 			Username: "test",

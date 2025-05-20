@@ -24,6 +24,8 @@ export default {
     },
 
     alert: {
+      successLogin: "You have successfully logged in.",
+      successRegister: "Registration successful. You can login now.",
       logout: "You have logged out",
     },
   }

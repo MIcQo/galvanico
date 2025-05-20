@@ -2,12 +2,9 @@ package user
 
 import (
 	"bytes"
-	"context"
 	"database/sql"
-	"errors"
 	"galvanico/internal/auth"
 	"galvanico/internal/config"
-	"galvanico/internal/notifications"
 	"io"
 	"net/http"
 	"testing"
@@ -17,7 +14,6 @@ import (
 	"github.com/goccy/go-json"
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -25,98 +21,6 @@ import (
 )
 
 const signingKey = "AToAQz1ZtiDFPd6S5O4lyPCixPpo5I58"
-
-type fakerUserRepository struct {
-	data map[string]*User
-}
-
-func (f *fakerUserRepository) GetByUsername(_ context.Context, username string) (*User, error) {
-	if usr, ok := f.data[username]; ok {
-		return usr, nil
-	}
-	return nil, sql.ErrNoRows
-}
-
-func (f *fakerUserRepository) GetByID(_ context.Context, id uuid.UUID) (*User, error) {
-	for _, usr := range f.data {
-		if usr.ID.String() == id.String() {
-			return usr, nil
-		}
-	}
-
-	return nil, sql.ErrNoRows
-}
-
-func (f *fakerUserRepository) AddFeature(_ context.Context, _ *Feature) error {
-	panic("implement me")
-}
-
-func (f *fakerUserRepository) RemoveFeature(_ context.Context, _ *Feature) error {
-	panic("implement me")
-}
-
-func (f *fakerUserRepository) UpdateLastLogin(_ context.Context, _ *User, _ string) error {
-	return nil
-}
-
-func (f *fakerUserRepository) ChangeUsername(_ context.Context, _ *User) error {
-	return nil
-}
-
-func (f *fakerUserRepository) Create(_ context.Context, usr *User) error {
-	if _, ok := f.data[usr.Username]; ok {
-		return errors.New("username already exists")
-	}
-
-	f.data[usr.Username] = usr
-
-	return nil
-}
-
-func (f *fakerUserRepository) ChangePassword(_ context.Context, _ *User) error {
-	return nil
-}
-
-type fakeService struct {
-	repo Repository
-}
-
-// GetUser this faked function mirrors real-one, cause of jwt
-//
-// Consider: Probably we can you other "verification" in the future
-func (f *fakeService) GetUser(ctx context.Context, token *jwt.Token) (*User, error) {
-	var claims, claimOk = token.Claims.(jwt.MapClaims)
-	if !claimOk {
-		return nil, errors.New("invalid user claims")
-	}
-
-	var sub, ok = claims["sub"].(string)
-	if !ok {
-		return nil, errors.New("invalid user sub")
-	}
-
-	var uid = uuid.MustParse(sub)
-	var usr, err = f.repo.GetByID(ctx, uid)
-	if err != nil {
-		return nil, err
-	}
-
-	return usr, nil
-}
-
-// SendActivationEmail is not what we want in testing mode
-func (f *fakeService) SendActivationEmail(_ *notifications.ActivationEmail) error {
-	return nil
-}
-
-// SendPasswordWasChangedEmail is not what we want in testing mode
-func (f *fakeService) SendPasswordWasChangedEmail(_ *notifications.PasswordWasChanged) error {
-	return nil
-}
-
-func (f *fakeService) Register(_ context.Context, _ *User) error {
-	return nil
-}
 
 func setup() (*fiber.App, *Handler) {
 	var pass, err = bcrypt.GenerateFromPassword([]byte("test"), bcrypt.DefaultCost)
@@ -130,7 +34,7 @@ func setup() (*fiber.App, *Handler) {
 	}
 
 	var cfg = config.NewDefaultConfig()
-	var repo = &fakerUserRepository{data: map[string]*User{
+	var repo = &FakerUserRepository{data: map[string]*User{
 		"test": {
 			Username: "test",
 			Password: sql.NullString{Valid: true, String: string(pass)},
@@ -144,7 +48,7 @@ func setup() (*fiber.App, *Handler) {
 			BanReason:     sql.NullString{Valid: true, String: "banned"},
 		},
 	}}
-	var svc = &fakeService{repo: repo}
+	var svc = &FakeService{repo: repo}
 	var app = fiber.New()
 	var handler = NewHandler(repo, svc, cfg)
 

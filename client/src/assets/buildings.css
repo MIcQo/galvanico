@@ -1,0 +1,126 @@
+
+.building {
+  position: absolute;
+  width: 86px;
+  height: 43px;
+
+  &.constructionSite {
+    .buildingimg, .hover {
+      background-image: url(https://s402-en.ikariam.gameforge.com/cdn/all/both/img/city/baustelle_leer.png);
+    }
+
+    .img_pos {
+      height: 140px;
+      left: -49px;
+      top: -60px;
+      width: 145px;
+    }
+  }
+
+  a {
+    display: block;
+    position: absolute;
+    bottom: -10px;
+    left: -10px;
+    width: 90px;
+    height: 60px;
+    transform-origin: 50% 50%;
+    -webkit-transform-origin: 50% 50%;
+    transform: rotate(28deg);
+    -ms-transform: rotate(28deg);
+  }
+
+  .img_pos {
+    width: 172px;
+    height: 140px;
+    position: absolute;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .hover {
+    position: absolute;
+    opacity: 0;
+    -webkit-filter: drop-shadow(12px 12px 7px rgba(255, 167, 0, 0.53));
+    filter: drop-shadow(12px 12px 7px rgba(255, 167, 0, 0.53));
+  }
+
+  .buildingimg {
+    position: absolute;
+  }
+}
+
+.land {
+  .img_pos {
+    bottom: -10px;
+    height: 78px;
+    left: -30px;
+    width: 129px;
+  }
+
+  .buildingimg, .hover {
+    background-image: url(https://s402-en.ikariam.gameforge.com/cdn/all/both/img/city/baustelle_land_rot.png);
+  }
+
+  a {
+    height: 50px;
+    width: 100px;
+    left: -20px;
+    bottom: -5px;
+  }
+}
+
+.townhall, .city_hall {
+  .img_pos {
+    left: -22px;
+    top: -71px;
+  }
+
+  .buildingimg, .hover {
+    background-image: url(@/assets/buildings/townhall.png);
+  }
+
+  a {
+    height: 89px;
+    width: 106px;
+    left: -6px;
+    bottom: -5px;
+  }
+}
+
+.warehouse {
+  .img_pos {
+    left: -59px;
+    top: -68px;
+  }
+
+  .buildingimg, .hover {
+    background-image: url(@/assets/buildings/warehouse.png);
+  }
+
+  a {
+    height: 80px;
+    width: 90px;
+    left: -15px;
+    bottom: -5px;
+  }
+}
+
+.university {
+  .buildingimg, .hover {
+    background-image: url(@/assets/buildings/im_7511.png);
+  }
+
+  .img_pos {
+    left: -14px;
+    top: -93px;
+  }
+
+  a {
+    height: 80px;
+    width: 90px;
+    left: -15px;
+    bottom: -5px;
+  }
+}

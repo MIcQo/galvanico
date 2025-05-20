@@ -3,16 +3,37 @@ package building
 import (
 	"fmt"
 	"strings"
+
+	"github.com/goccy/go-json"
 )
 
 type Building uint
 
 // String returns the string representation of a Building
-func (b Building) String() string {
-	if int(b) >= len(buildingNames) {
+func (b *Building) String() string {
+	if int(*b) >= len(buildingNames) {
 		return "unknown"
 	}
-	return buildingNames[b]
+	return buildingNames[*b]
+}
+
+func (b Building) MarshalJSON() ([]byte, error) {
+	return json.Marshal(b.String())
+}
+
+func (b *Building) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	building, err := FromString(s)
+	if err != nil {
+		return err
+	}
+
+	*b = building
+	return nil
 }
 
 const (
@@ -85,4 +106,46 @@ var buildingNames = []string{
 	"optical_laboratory",
 	"chemical_plant",
 	"explosives_testing_site",
+}
+
+func GetStandardBuildings() []Building {
+	return []Building{
+		GovernmentPalace,
+		ColonialOffice,
+		PublicHouse,
+		NaturalHistoryMuseum,
+		University,
+		Factory,
+		Cathedral,
+		ForeignMinistry,
+		IndustrialWarehouse,
+		Landfill,
+		StockExchange,
+		IntelligenceBureau,
+		MilitaryBarracks,
+		PrivateerBase,
+		ForestryOffice,
+		Sawmill,
+		Winery,
+		WineDistillery,
+		StoneQuarry,
+		ArchitecturalBureau,
+		GlassFactory,
+		OpticalLaboratory,
+		ChemicalPlant,
+		ExplosivesTestingSite,
+	}
+}
+
+func GetDefenseBuildings() []Building {
+	return []Building{
+		FortifiedCityWall,
+	}
+}
+
+func GetPortBuildings() []Building {
+	return []Building{
+		IndustrialPort,
+		NavalDockyard,
+	}
 }

@@ -189,6 +189,8 @@ linters:
       context: scope
     usetesting:
       os-temp-dir: true
+    recvcheck:
+      disable-builtin: false
   exclusions:
     generated: lax
     presets:
