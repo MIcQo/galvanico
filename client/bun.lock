@@ -17,7 +17,7 @@
       },
       "devDependencies": {
         "@playwright/test": "1.52.0",
-        "@tsconfig/node22": "22.0.1",
+        "@tsconfig/node22": "22.0.2",
         "@types/jsdom": "21.1.7",
         "@types/node": "22.15.18",
         "@vitejs/plugin-vue": "5.2.4",
@@ -318,7 +318,7 @@
 
     "@tanstack/vue-query-devtools": ["@tanstack/vue-query-devtools@5.74.3", "", { "dependencies": { "@tanstack/query-devtools": "5.73.3" }, "peerDependencies": { "@tanstack/vue-query": "^5.74.3", "vue": "^3.3.0" } }, "sha512-9zOVXiwEp08Z3sew7i+/tSzp5XzBSI0mAX3f4s3ZhcSU76vv8MQjgeKHmDh7vx773BIFUApyUh0lDyxpGsFKVQ=="],
 
-    "@tsconfig/node22": ["@tsconfig/node22@22.0.1", "", {}, "sha512-VkgOa3n6jvs1p+r3DiwBqeEwGAwEvnVCg/hIjiANl5IEcqP3G0u5m8cBJspe1t9qjZRlZ7WFgqq5bJrGdgAKMg=="],
+    "@tsconfig/node22": ["@tsconfig/node22@22.0.2", "", {}, "sha512-Kmwj4u8sDRDrMYRoN9FDEcXD8UpBSaPQQ24Gz+Gamqfm7xxn+GBR7ge/Z7pK8OXNGyUzbSwJj+TH6B+DS/epyA=="],
 
     "@types/estree": ["@types/estree@1.0.7", "", {}, "sha512-w28IoSUCJpidD/TGviZwwMJckNESJZXFu7NBZ5YJ4mEUnNraUn9Pm8HSZm/jDF1pDWYKspWE7oVphigUPRakIQ=="],
 
