@@ -28,7 +28,7 @@ COPY --from=prerelease /temp/prod/dist public
 RUN go mod download
 RUN CGO_ENABLED=0 go build -o /go/bin/app
 
-FROM busybox:uclibc@sha256:ed0455a0f719c9f203d2ec745682ed78854395fe419bfac8b6ea2ee2e9413409 AS busybox
+FROM busybox:uclibc@sha256:cc57e0ff4b6d3138931ff5c7180d18078813300e2508a25fb767a4d36df30d4d AS busybox
 
 FROM gcr.io/distroless/base@sha256:cef75d12148305c54ef5769e6511a5ac3c820f39bf5c8a4fbfd5b76b4b8da843
 WORKDIR /go
