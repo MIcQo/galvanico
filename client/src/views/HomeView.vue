@@ -10,10 +10,12 @@ import {isAuthenticated} from "@/services/auth.ts";
         <p class="py-6">
           {{ $t('index.imprint') }}
         </p>
+        <div>
         <RouterLink :to="{name: isAuthenticated() ? `game.index` : `auth.register`}"
-                    class="btn btn-primary">
+                    class="btn btn-soft btn-primary">
           {{ $t('index.getStarted') }}
         </RouterLink>
+        </div>
       </div>
     </div>
   </div>

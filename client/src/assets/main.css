@@ -20,6 +20,10 @@
 
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 .fade-enter-to, .fade-leave-from {
