@@ -6,6 +6,8 @@ github.com/ansrivas/fiberprometheus/v2 v2.9.1 h1:Ui1gPZRax1SNplReQ9G2xEdqEmu436T
 github.com/ansrivas/fiberprometheus/v2 v2.9.1/go.mod h1:j8NqXE0/WczX+65E/pCCqWngMfaLda85Hq+O9hg9odU=
 github.com/ansrivas/fiberprometheus/v2 v2.10.0 h1:gzzJ2PSMjYEiZIfI9Ip0gVCOCRnM0CwongXB4+qNyks=
 github.com/ansrivas/fiberprometheus/v2 v2.10.0/go.mod h1:ujpKAV2VGNhjIBTkp5KEP/ICpSJtFq3tpm+9sJUktDs=
+github.com/ansrivas/fiberprometheus/v2 v2.11.0 h1:CLbxIvpmKPSqXnL26iJ2BmNPmcejmzxr/js8PIa0Pj4=
+github.com/ansrivas/fiberprometheus/v2 v2.11.0/go.mod h1:ujpKAV2VGNhjIBTkp5KEP/ICpSJtFq3tpm+9sJUktDs=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
 github.com/brianvoe/gofakeit/v7 v7.2.1 h1:AGojgaaCdgq4Adzrd2uWdbGNDyX6MWNhHdQBraNfOHI=
