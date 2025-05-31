@@ -22,7 +22,7 @@ require (
 	github.com/uptrace/bun/extra/bundebug v1.2.11
 	github.com/uptrace/bun/extra/bunotel v1.2.11
 	golang.org/x/crypto v0.38.0
-	golang.org/x/exp v0.0.0-20250530174510-65e920069ea6
+	golang.org/x/exp v0.0.0-20250531010427-b6e5de432a8b
 	golang.org/x/text v0.25.0
 	gopkg.in/yaml.v3 v3.0.1
 )
