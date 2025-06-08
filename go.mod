@@ -17,8 +17,8 @@ require (
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
-	github.com/uptrace/bun v1.2.11
-	github.com/uptrace/bun/dialect/pgdialect v1.2.11
+	github.com/uptrace/bun v1.2.12
+	github.com/uptrace/bun/dialect/pgdialect v1.2.12
 	github.com/uptrace/bun/extra/bundebug v1.2.11
 	github.com/uptrace/bun/extra/bunotel v1.2.11
 	golang.org/x/crypto v0.39.0
