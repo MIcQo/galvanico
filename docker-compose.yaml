@@ -12,7 +12,7 @@ services:
 #      COCKROACH_PASSWORD: "game"
 
   nats:
-    image: nats:latest@sha256:57f45fba83001bfff519e918035305f02eb897a172f82d43933136e0f6aceb1e
+    image: nats:latest@sha256:c8cd23806eef5b74ae49275e02282590800738cc8d90bfe094d5fe1298ac9fbb
     ports:
       - "4222:4222"
       - "8222:8222"
