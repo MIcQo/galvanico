@@ -131,6 +131,8 @@ github.com/uptrace/bun/dialect/pgdialect v1.2.12 h1:UxbxJXqQPeSBDnPMWAi9kDOeWX9H
 github.com/uptrace/bun/dialect/pgdialect v1.2.12/go.mod h1:Q7xQWbFs2Msg87BxkJtKkBSWSLmmXN+gB5mEi7212PI=
 github.com/uptrace/bun/extra/bundebug v1.2.11 h1:RyJmjITEXLRvFJwjD+u2U2eZijJhL7eIdzvW7FQSUgg=
 github.com/uptrace/bun/extra/bundebug v1.2.11/go.mod h1:K/cBN9HSW/hC17R1zVKcLOPi5PKG2PY1j7powaoCBFU=
+github.com/uptrace/bun/extra/bundebug v1.2.12 h1:hiPesTgVZAGfIgC2hi1SYuP9EztzhupL4uC5yd2d3Hw=
+github.com/uptrace/bun/extra/bundebug v1.2.12/go.mod h1:QOncBc89nWhNWRwMibGyFDcIDhbFD3OzwDyiJZxgSlY=
 github.com/uptrace/bun/extra/bunotel v1.2.11 h1:ddt96XrbvlVZu5vBddP6WmbD6bdeJTaWY9jXlfuJKZE=
 github.com/uptrace/bun/extra/bunotel v1.2.11/go.mod h1:w6Mhie5tLFeP+5ryjq4PvgZEESRJ1iL2cbvxhm+f8q4=
 github.com/uptrace/opentelemetry-go-extra/otelsql v0.3.2 h1:ZjUj9BLYf9PEqBn8W/OapxhPjVRdC6CsXTdULHsyk5c=
