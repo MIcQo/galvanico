@@ -19,7 +19,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/uptrace/bun v1.2.12
 	github.com/uptrace/bun/dialect/pgdialect v1.2.12
-	github.com/uptrace/bun/extra/bundebug v1.2.11
+	github.com/uptrace/bun/extra/bundebug v1.2.12
 	github.com/uptrace/bun/extra/bunotel v1.2.11
 	golang.org/x/crypto v0.39.0
 	golang.org/x/exp v0.0.0-20250606033433-dcc06ee1d476
