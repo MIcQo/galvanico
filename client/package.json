@@ -33,7 +33,7 @@
     "@types/node": "22.15.30",
     "@vitejs/plugin-vue": "5.2.4",
     "@vitejs/plugin-vue-jsx": "4.2.0",
-    "@vitest/eslint-plugin": "1.2.1",
+    "@vitest/eslint-plugin": "1.2.2",
     "@vue/eslint-config-prettier": "10.2.0",
     "@vue/eslint-config-typescript": "14.5.0",
     "@vue/test-utils": "2.4.6",
