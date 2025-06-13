@@ -22,7 +22,7 @@
         "@types/node": "22.15.30",
         "@vitejs/plugin-vue": "5.2.4",
         "@vitejs/plugin-vue-jsx": "4.2.0",
-        "@vitest/eslint-plugin": "1.2.1",
+        "@vitest/eslint-plugin": "1.2.5",
         "@vue/eslint-config-prettier": "10.2.0",
         "@vue/eslint-config-typescript": "14.5.0",
         "@vue/test-utils": "2.4.6",
@@ -354,7 +354,7 @@
 
     "@vitejs/plugin-vue-jsx": ["@vitejs/plugin-vue-jsx@4.2.0", "", { "dependencies": { "@babel/core": "^7.27.1", "@babel/plugin-transform-typescript": "^7.27.1", "@rolldown/pluginutils": "^1.0.0-beta.9", "@vue/babel-plugin-jsx": "^1.4.0" }, "peerDependencies": { "vite": "^5.0.0 || ^6.0.0", "vue": "^3.0.0" } }, "sha512-DSTrmrdLp+0LDNF77fqrKfx7X0ErRbOcUAgJL/HbSesqQwoUvUQ4uYQqaex+rovqgGcoPqVk+AwUh3v9CuiYIw=="],
 
-    "@vitest/eslint-plugin": ["@vitest/eslint-plugin@1.2.1", "", { "dependencies": { "@typescript-eslint/utils": "^8.24.0" }, "peerDependencies": { "eslint": ">= 8.57.0", "typescript": ">= 5.0.0", "vitest": "*" }, "optionalPeers": ["typescript", "vitest"] }, "sha512-JQr1jdVcrsoS7Sdzn83h9sq4DvREf9Q/onTZbJCqTVlv/76qb+TZrLv/9VhjnjSMHweQH5FdpMDeCR6aDe2fgw=="],
+    "@vitest/eslint-plugin": ["@vitest/eslint-plugin@1.2.5", "", { "dependencies": { "@typescript-eslint/utils": "^8.24.0" }, "peerDependencies": { "eslint": ">= 8.57.0", "typescript": ">= 5.0.0", "vitest": "*" }, "optionalPeers": ["typescript", "vitest"] }, "sha512-cfmXz++mkqYpssrKymd7KJumxaZBsfFji2y22QV04kDYKRbiaZ+s4WZL/bzAkcefVKj4KkFctVALHdDZhFhHGg=="],
 
     "@vitest/expect": ["@vitest/expect@3.2.2", "", { "dependencies": { "@types/chai": "^5.2.2", "@vitest/spy": "3.2.2", "@vitest/utils": "3.2.2", "chai": "^5.2.0", "tinyrainbow": "^2.0.0" } }, "sha512-ipHw0z669vEMjzz3xQE8nJX1s0rQIb7oEl4jjl35qWTwm/KIHERIg/p/zORrjAaZKXfsv7IybcNGHwhOOAPMwQ=="],
 
