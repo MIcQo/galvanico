@@ -16,7 +16,7 @@ require (
 	github.com/nats-io/nats.go v1.43.0
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.9.1
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	github.com/uptrace/bun v1.2.12
 	github.com/uptrace/bun/dialect/pgdialect v1.2.12
 	github.com/uptrace/bun/extra/bundebug v1.2.12
