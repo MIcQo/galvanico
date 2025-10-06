@@ -38,7 +38,7 @@ jobs:
           GOOS=windows GOARCH=amd64 go build -o ${{ github.event.repository.name }}_windows_amd64.exe
 
       - name: Create release
-        uses: softprops/action-gh-release@d5382d3e6f2fa7bd53cb749d33091853d4985daf # v2
+        uses: softprops/action-gh-release@62c96d0c4e8a889135c1f3a25910db8dbe0e85f7 # v2
         with:
           tag_name: ${{ steps.tag_name.outputs.TAG_NAME }}
           files: |
