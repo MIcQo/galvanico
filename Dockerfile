@@ -21,7 +21,7 @@ ENV NODE_ENV=production
 ENV VITE_BACKEND_URL=/
 RUN bun run build-only
 
-FROM golang:1.24@sha256:db5d0afbfb4ab648af2393b92e87eaae9ad5e01132803d80caef91b5752d289c AS builder
+FROM golang:1.26@sha256:c42e4d75186af6a44eb4159dcfac758ef1c05a7011a0052fe8a8df016d8e8fb9 AS builder
 WORKDIR /go/src/app
 COPY . .
 COPY --from=prerelease /temp/prod/dist public
